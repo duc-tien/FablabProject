@@ -1,11 +1,14 @@
 import HomePage from './pages/HomePage';
-
+import DetailPage from '@src/pages/DetailPage';
+import { Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
 function App() {
   return (
-    <div className="App">
-      <h1>React</h1>
-      <HomePage />
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/detail" element={<DetailPage />} />
+      <Route path="/login" element={<LoginPage />} />
+    </Routes>
   );
 }
 
