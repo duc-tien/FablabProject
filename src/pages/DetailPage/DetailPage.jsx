@@ -1,10 +1,10 @@
-// ----------------------------------START LIBRARY MAUNUAL---------------------------------------------
+// ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './DetailPage.module.scss';
-import { login } from '../../services/loginService';
-import { getAll, getOnReq } from '../../services/getService';
-import ModalLogin from '../../components/ModalLogin/ModalLogin';
-import { displayModalLogin } from '../../redux/displaySlice';
-import checkLogin from '../../utils/checkLogin';
+import { login } from '~/services/loginService';
+import { getAll, getOnReq } from '~/services/getService';
+import ModalLogin from '~/components/ModalLogin/ModalLogin';
+import { displayModalLogin } from '~/redux/displaySlice';
+import checkLogin from '~/utils/checkLogin';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch, useSelector } from 'react-redux';
 
-// --------------------------------- END REACT LIBRARY---------------------------------------------
+// --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function DetailPage() {

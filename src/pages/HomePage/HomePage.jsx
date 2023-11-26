@@ -1,13 +1,13 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './HomePage.module.scss';
-import { addHobby, deleteHobby } from '../../redux/hobbySlice';
-import ModalLogin from '../../components/ModalLogin/ModalLogin';
+import { addHobby, deleteHobby } from '~/redux/hobbySlice';
+import ModalLogin from '~/components/ModalLogin/ModalLogin';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// --------------------------------- END  LIBRARY---------------------------------------------
+// --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function HomePage() {

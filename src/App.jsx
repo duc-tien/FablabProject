@@ -1,5 +1,5 @@
-import HomePage from './pages/HomePage';
-import DetailPage from '@src/pages/DetailPage';
+import HomePage from '~/pages/HomePage';
+import DetailPage from './pages/DetailPage';
 import { Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 function App() {

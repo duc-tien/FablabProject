@@ -1,11 +1,11 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './LoginPAge.module.scss';
+import { login } from '~/services/loginService';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import { login } from '../../services/loginService';
 import { useNavigate } from 'react-router-dom';
 // --------------------------------- END  LIBRARY---------------------------------------------
 const css = classNames.bind(style);

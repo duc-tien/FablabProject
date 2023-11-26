@@ -1,4 +1,4 @@
-import instance from "../utils/api";
+import instance from "~/utils/api";
 
 export const login= async(userName,passWords)=>{
     try {
