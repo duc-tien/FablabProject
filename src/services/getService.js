@@ -23,3 +23,7 @@ export const getOnReq=async(search,page="1")=>{
         console.log(error);
     }
 }
+export const getDataTest= async()=>{
+    const res=await instance.get('/posts')
+        return res.data;
+}

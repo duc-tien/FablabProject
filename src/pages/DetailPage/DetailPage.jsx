@@ -1,8 +1,9 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './DetailPage.module.scss';
 import { login } from '~/services/loginService';
-import { getAll, getOnReq } from '~/services/getService';
+import { getAll, getOnReq, getDataTest } from '~/services/getService';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
+import { getMe, getProduct } from '~/redux/apiSlice';
 import { displayModalLogin } from '~/redux/displaySlice';
 import checkLogin from '~/utils/checkLogin';
 
@@ -22,30 +23,50 @@ function DetailPage() {
   const isLoginAgain = useSelector((state) => state.display.isLogin);
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    let date = new Date();
-    const fetchApi = async () => {
-      try {
-        const res = await getAll();
-        setData(res);
-      } catch (error) {}
-    };
+  // useEffect(() => {
+  //   dispatch(getProduct());
+  //   let date = new Date();
+  //   const fetchApi = async () => {
+  //     try {
+  //       const res = await getAll();
+  //       setData(res);
+  //     } catch (error) {}
+  //   };
 
-    if (!checkLogin()) {
-      dispatch(displayModalLogin(true));
-    } else {
-      fetchApi();
-    }
-  }, []);
+  //   if (!checkLogin()) {
+  //     dispatch(displayModalLogin(true));
+  //   } else {
+  //     fetchApi();
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchApi = async () => {
+  //     await dispatch(getMe());
+  //   };
+  //   fetchApi();
+  // }, []);
+  const goiAPI = async () => {
+    await dispatch(getMe());
+  };
+  const dataGetMe = useSelector((state) => state.api.allData);
+
   return (
+    // <div>
+    //   {isLoginAgain && <ModalLogin />}
+    //   <h1>DetailPage</h1>
+    //   <div className="mt-11 ml-11">
+    //     {data.map((item, index) => {
+    //       return <div key={index}>{item.tenDanhMuc}</div>;
+    //     })}
+    //   </div>
+    // </div>
     <div>
-      {isLoginAgain && <ModalLogin />}
-      <h1>DetailPage</h1>
-      <div className="mt-11 ml-11">
-        {data.map((item, index) => {
-          return <div key={index}>{item.tenDanhMuc}</div>;
-        })}
-      </div>
+      test call api redux
+      <button onClick={(e) => goiAPI()}>Get data</button>
+      {dataGetMe.map((data, index) => {
+        return <div key={index}> {data.id} </div>;
+      })}
     </div>
   );
 }
