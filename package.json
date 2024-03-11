@@ -1,5 +1,5 @@
 {
-  "name": "vtsweb",
+  "name": "fablabweb",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -26,7 +26,8 @@
     "react-router-dom": "^6.14.2",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
-    "sass": "^1.64.1"
+    "sass": "^1.64.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^1.0.7",

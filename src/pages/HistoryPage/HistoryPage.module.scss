@@ -1,0 +1,30 @@
+.detailpage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  .sub-header {
+    display: flex;
+    justify-content: flex-start;
+    height: 4vh;
+    width: 100%;
+    .tag {
+      width: 10%;
+      height: 4vh;
+      line-height: 4vh;
+      text-align: center;
+      font-weight: bold;
+      color: #2d2d2d;
+      margin: 0.05vh 0.1vw 0 0.2vw;
+      background-color: #d2d2d2;
+      border-radius: 6px;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    .active {
+      background-color: #1883c9;
+      color: #fff;
+    }
+  }
+}

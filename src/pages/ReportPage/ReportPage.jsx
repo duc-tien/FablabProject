@@ -1,5 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
-import style from './HomePage.module.scss';
+import style from './ReportPage.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import instance from '~/utils/api';
@@ -11,13 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
-function HomePage() {
-  return (
-    <div className={css('homepage')}>
-      <div className={css('view-px')}></div>
-      <div className={css('view-vh')}></div>
-    </div>
-  );
+function ReportPage() {
+  return <div className={css('homepage')}></div>;
 }
 
-export default HomePage;
+export default ReportPage;

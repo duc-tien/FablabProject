@@ -1,7 +1,11 @@
 const path = {
     home: '/',
-    detail:'/detail',
-    login:'/login'
+    history:'/history',
+    machine:'/machine',
+    project:'/project',
+    updateproject:'/updateproject',
+    report:'/report',
+    order:'/order'
 };
 
 export default path;

@@ -1,0 +1,17 @@
+.outer {
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  display: flex;
+
+  .inner {
+    margin: auto;
+    text-align: center;
+    line-height: 130px;
+    font-size: 18px;
+    height: 130px;
+    width: 130px;
+    border-radius: 50%;
+    background-color: #fff;
+  }
+}
