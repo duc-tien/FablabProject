@@ -1,7 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './BackToTop.module.scss';
-import { displayModalLogin } from '~/redux/displaySlice';
-import { login } from '~/services/loginService';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import { useState } from 'react';
 import classNames from 'classnames/bind';

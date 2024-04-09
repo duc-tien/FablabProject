@@ -2,7 +2,6 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { publicRoutes, privateRoutes } from './routes';
 import Layout from '~/Layout';
 import { useEffect, useState } from 'react';
-import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 function App() {
   // const navigate = useNavigate();
@@ -17,21 +16,6 @@ function App() {
   // }, []);
   return (
     <Routes>
-      {/* {roleOfPerson == 'user' &&
-        publicRoutes.map((route, index) => {
-          const Page = route.page;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <Layout header={route.header}>
-                  <Page />
-                </Layout>
-              }
-            />
-          );
-        })} */}
       {privateRoutes.map((route, index) => {
         const Page = route.page;
         return (
@@ -47,8 +31,6 @@ function App() {
         );
       })}
       <Route path="*" element={'Page Not Found'} />
-      <Route path="/" element={<HomePage />} />
-      {/* <Route path="/login" element={<LoginPage />} /> */}
     </Routes>
   );
 }
