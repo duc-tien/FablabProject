@@ -5,19 +5,19 @@ import { useEffect, useState } from 'react';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 function App() {
-  const navigate = useNavigate();
-  const [roleOfPerson, setRoleOfPerson] = useState('');
-  useEffect(() => {
-    const role = localStorage.getItem('role');
-    if (role) {
-      setRoleOfPerson(role);
-    } else {
-      navigate('/login');
-    }
-  }, []);
+  // const navigate = useNavigate();
+  // const [roleOfPerson, setRoleOfPerson] = useState('');
+  // useEffect(() => {
+  //   const role = localStorage.getItem('role');
+  //   if (role) {
+  //     setRoleOfPerson(role);
+  //   } else {
+  //     navigate('/login');
+  //   }
+  // }, []);
   return (
     <Routes>
-      {roleOfPerson == 'user' &&
+      {/* {roleOfPerson == 'user' &&
         publicRoutes.map((route, index) => {
           const Page = route.page;
           return (
@@ -31,25 +31,24 @@ function App() {
               }
             />
           );
-        })}
-      {roleOfPerson == 'admin' &&
-        privateRoutes.map((route, index) => {
-          const Page = route.page;
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <Layout header={route.header}>
-                  <Page />
-                </Layout>
-              }
-            />
-          );
-        })}
+        })} */}
+      {privateRoutes.map((route, index) => {
+        const Page = route.page;
+        return (
+          <Route
+            key={index}
+            path={route.path}
+            element={
+              <Layout header={route.header}>
+                <Page />
+              </Layout>
+            }
+          />
+        );
+      })}
       <Route path="*" element={'Page Not Found'} />
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
+      {/* <Route path="/login" element={<LoginPage />} /> */}
     </Routes>
   );
 }

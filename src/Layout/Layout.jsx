@@ -54,20 +54,15 @@ function Layout({ children, header }) {
           <LogoBKU className={css('logo')} />
           <LogoFablab className={css('logo')} />
         </div>
-        {roleOfPerson == 'admin' &&
-          privateRoutes.map((route, index) => {
-            return (
-              <NavLink
-                key={index}
-                className={(nav) => css('sidebar-element', { active: nav.isActive })}
-                to={route.path}
-              >
-                <FontAwesomeIcon className={css('sidebar-icon')} icon={listIconAdmin[index]} />
-                {isExtra && <span className={css('sidebar-text')}>{route.header}</span>}
-              </NavLink>
-            );
-          })}
-        {roleOfPerson == 'user' &&
+        {privateRoutes.map((route, index) => {
+          return (
+            <NavLink key={index} className={(nav) => css('sidebar-element', { active: nav.isActive })} to={route.path}>
+              <FontAwesomeIcon className={css('sidebar-icon')} icon={listIconAdmin[index]} />
+              {isExtra && <span className={css('sidebar-text')}>{route.header}</span>}
+            </NavLink>
+          );
+        })}
+        {/* {roleOfPerson == 'user' &&
           publicRoutes.map((route, index) => {
             return (
               <NavLink
@@ -79,7 +74,7 @@ function Layout({ children, header }) {
                 {isExtra && <span className={css('sidebar-text')}>{route.header}</span>}
               </NavLink>
             );
-          })}
+          })} */}
       </div>
       <div className={css('body')}>
         <div className={css('header')}>{header}</div>
