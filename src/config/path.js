@@ -5,7 +5,8 @@ const path = {
     project:'/project',
     updateproject:'/updateproject',
     report:'/report',
-    order:'/order'
+    order:'/order',
+    warehouse:'/warehouse'
 };
 
 export default path;

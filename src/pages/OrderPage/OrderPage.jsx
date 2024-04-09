@@ -3,6 +3,7 @@ import style from './OrderPage.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import instance from '~/utils/api';
+import Alert from '~/components/Alert';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
@@ -12,25 +13,107 @@ import { useDispatch, useSelector } from 'react-redux';
 const css = classNames.bind(style);
 
 function OrderPage() {
+  const [alert, setAlert] = useState({ isAlert: false, content: '' });
+  const [listClient, setListClient] = useState([]);
+  const [infoClient, setInfoClient] = useState({
+    nameclient: '',
+    email: '',
+    phone: '',
+    nameproduct: '',
+    startdate: '',
+    enddate: '',
+  });
+  const [enableSubmit, setEnableSubmit] = useState(true);
+  const updateClient = (value, key) => {
+    setInfoClient((prev) => {
+      return {
+        ...prev,
+        [key]: value,
+      };
+    });
+  };
+  const cancelAlert = () => {
+    setAlert({
+      isAlert: false,
+      content: '',
+    });
+  };
+  const addClientToList = () => {
+    let count = 0;
+    for (let value of Object.values(infoClient)) {
+      if (!value) count++;
+    }
+    if (count != 0) {
+      setAlert({
+        isAlert: true,
+        content: 'Vui lòng nhập đầy đủ thông tin',
+      });
+    } else {
+      setListClient((prev) => {
+        return [...prev, infoClient];
+      });
+    }
+  };
+
+  const deleteClientFromList = (index) => {
+    setListClient((prev) => {
+      let tempListClient = [...prev];
+      tempListClient.splice(index, 1);
+      return tempListClient;
+    });
+  };
+
   return (
     <div className={css('container')}>
       <div className={css('form-area')}>
         <div className={css('form-title')}>Tên khách hàng</div>
-        <input className={css('form-input')} type="text" />
+        <input
+          className={css('form-input')}
+          type="text"
+          value={infoClient?.nameclient}
+          onChange={(e) => updateClient(e.target.value, 'nameclient')}
+        />
         <div className={css('form-title')}>Email</div>
-        <input className={css('form-input')} type="text" />
+        <input
+          className={css('form-input')}
+          type="text"
+          value={infoClient?.email}
+          onChange={(e) => updateClient(e.target.value, 'email')}
+        />
         <div className={css('form-title')}>Ngày tạo</div>
-        <input className={css('form-input')} type="date" />
+        <input
+          className={css('form-input')}
+          type="date"
+          value={infoClient?.startdate}
+          onChange={(e) => updateClient(e.target.value, 'startdate')}
+        />
       </div>
       <div className={css('form-area')}>
         <div className={css('form-title')}>Số điện thoại</div>
-        <input className={css('form-input')} type="text" />
+        <input
+          className={css('form-input')}
+          type="text"
+          value={infoClient?.phone}
+          onChange={(e) => updateClient(e.target.value, 'phone')}
+        />
         <div className={css('form-title')}>Tên sản phẩm</div>
-        <input className={css('form-input')} type="text" />
+        <input
+          className={css('form-input')}
+          type="text"
+          value={infoClient?.nameproduct}
+          onChange={(e) => updateClient(e.target.value, 'nameproduct')}
+        />
         <div className={css('form-title')}>Kỳ vọng</div>
-        <input className={css('form-input')} type="date" />
+        <input
+          className={css('form-input')}
+          type="date"
+          value={infoClient?.enddate}
+          onChange={(e) => updateClient(e.target.value, 'enddate')}
+        />
       </div>
-      <button className={css('button-add')}>Thêm mới</button>
+      <button onClick={() => addClientToList()} className={css('button-add')}>
+        Thêm mới
+      </button>
       <table className={css('table-detail')}>
         <thead>
           <tr>
@@ -43,17 +126,22 @@ function OrderPage() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Nguyễn A</td>
-            <td>0603545035</td>
-            <td>bku@hcmut.edu.vn</td>
-            <td>Dự án Demo</td>
-            <td>21-02-2024</td>
-            <td>28-02-2024</td>
-            <td>Xóa</td>
-          </tr>
+          {listClient?.map((client, index) => {
+            return (
+              <tr key={index}>
+                <td>{client.nameclient}</td>
+                <td>{client.phone}</td>
+                <td>{client.email}</td>
+                <td>{client.nameproduct}</td>
+                <td>{client.startdate}</td>
+                <td>{client.enddate}</td>
+                <td onClick={() => deleteClientFromList(index)}>Xóa</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
     </div>
   );
 }

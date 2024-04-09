@@ -1,0 +1,36 @@
+.loading {
+  height: 104px;
+  width: 180px;
+  background-color: rgba(0, 143, 226, 0.6);
+  border-radius: 16px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: sliderloading ease 0.2s;
+
+  .icon-loading {
+    height: 48px;
+    width: 48px;
+    margin-top: 18px;
+    color: #fff;
+    animation: spinner 2s ease infinite;
+  }
+  div {
+    margin-top: 8px;
+    font-weight: bold;
+    color: #fff;
+  }
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

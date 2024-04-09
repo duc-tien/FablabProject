@@ -5,6 +5,7 @@ import ProjectPage from "~/pages/ProjectPage";
 import UpdateProjectPage from "~/pages/UpdateProjectPage";
 import ReportPage from "~/pages/ReportPage";
 import OrderPage from "~/pages/OrderPage";
+import Warehouse from "~/pages/Warehouse";
 
 const page={
     home:HomePage,
@@ -14,6 +15,7 @@ const page={
     updateproject:UpdateProjectPage,
     report:ReportPage,
     order:OrderPage,
+    warehouse:Warehouse
 }
 
 export default page

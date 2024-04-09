@@ -2,6 +2,7 @@
 import style from './HistoryPage.module.scss';
 import Employee from './Employee';
 import Machine from './Machine';
+import Detail from './Detail';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
@@ -18,7 +19,7 @@ function HistoryPage() {
   const [active, setActive] = useState(false);
   const [active2, setActive2] = useState(false);
   return (
-    <div className={css('detailpage')}>
+    <div className={css('container')}>
       <div className={css('sub-header')}>
         <div
           onClick={() => {
@@ -45,12 +46,12 @@ function HistoryPage() {
           }}
           className={css('tag', { active: active && !active2 })}
         >
-          PAGE 3
+          Detail
         </div>
       </div>
       {!active && !active2 && <Machine />}
       {!active && active2 && <Employee />}
-      {active && !active2 && <div> page detail 3</div>}
+      {active && !active2 && <Detail />}
     </div>
   );
 }

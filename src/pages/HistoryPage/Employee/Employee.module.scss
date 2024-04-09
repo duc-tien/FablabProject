@@ -1,6 +1,6 @@
 .container {
   width: 100%;
-  height: 100%;
+  height: auto;
   .select-area {
     display: flex;
     margin-top: 3vh;
@@ -39,6 +39,33 @@
     height: 32px;
     line-height: 32px;
     font-weight: bold;
+  }
+  .info-worker {
+    width: 80vw;
+    height: 32px;
+    font-size: 18px;
+    margin: 2vh auto 2vh auto;
+    font-weight: bold;
+    display: flex;
+    span {
+      display: inline-block;
+      height: 32px;
+      line-height: 32px;
+
+      &:nth-child(odd) {
+        background-color: #137ac4;
+        border-radius: 8px;
+        margin-right: 1.4vw;
+        color: #fff;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      &:nth-child(even) {
+        min-width: 8vw;
+        margin-right: 5vw;
+      }
+    }
   }
   .table-detail {
     width: 80vw;

@@ -1,12 +1,10 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Machine.module.scss';
-import { addHobby, deleteHobby } from '~/redux/hobbySlice';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
-import instance from '~/utils/api';
 import Machine01 from './Machine01';
 import Machine02 from './Machine02';
 import Machine03 from './Machine03';
 import Machine04 from './Machine04';
+import hubConnection from '~/utils/hubConnection';
 
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';

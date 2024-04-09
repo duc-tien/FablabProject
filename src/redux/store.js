@@ -12,14 +12,14 @@ import {
 import storage from "redux-persist/lib/storage";
 import hobbyReducer from "./hobbySlice";
 import displayReducer from './displaySlice'
-import apiReducer from "./apiSlice";
+import projectReducer from "./projectSlice";
 
 
   
 const rootReducer=combineReducers({
       hobby:hobbyReducer,
       display:displayReducer,
-      api:apiReducer
+      project:projectReducer
     })
 
 const persistConfig = {
@@ -40,4 +40,5 @@ const store = configureStore({
 
 export default store
 export const persistor = persistStore(store);
+
 

@@ -1,8 +1,8 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Layout.module.scss';
-import { publicRoutes } from '~/routes';
 import { LogoFablab } from '~/assets/imgs';
 import { LogoBKU } from '~/assets/imgs';
+import { publicRoutes, privateRoutes } from '~/routes';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -18,6 +18,7 @@ import {
   faDiagramProject,
   faChartSimple,
   faNewspaper,
+  faCartShopping,
 } from '@fortawesome/free-solid-svg-icons';
 
 // --------------------------------- END LIBRARY---------------------------------------------
@@ -25,6 +26,23 @@ const css = classNames.bind(style);
 
 function Layout({ children, header }) {
   const [isExtra, setIsExtra] = useState(false);
+  const [roleOfPerson, setRoleOfPerson] = useState('');
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    setRoleOfPerson(role);
+  }, []);
+
+  const listIconAdmin = [
+    faSliders,
+    // faNewspaper,
+    faHardDrive,
+    faUpload,
+    faDiagramProject,
+    faClockRotateLeft,
+    faCartShopping,
+    faChartSimple,
+  ];
+  const listIconUser = [faSliders, faHardDrive, faDiagramProject, faClockRotateLeft, faChartSimple];
   return (
     <div className={css('layout')}>
       <div
@@ -36,34 +54,32 @@ function Layout({ children, header }) {
           <LogoBKU className={css('logo')} />
           <LogoFablab className={css('logo')} />
         </div>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faSliders} />
-          {isExtra && <span className={css('sidebar-text')}>TỔNG QUAN</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/order">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faNewspaper} />
-          {isExtra && <span className={css('sidebar-text')}>TẠO ĐƠN HÀNG</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/machine">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faHardDrive} />
-          {isExtra && <span className={css('sidebar-text')}>GIÁM SÁT MÁY</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/updateproject">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faUpload} />
-          {isExtra && <span className={css('sidebar-text')}>CẬP NHẬT DỰ ÁN</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/project">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faDiagramProject} />
-          {isExtra && <span className={css('sidebar-text')}>THEO DÕI DỰ ÁN</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/history">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faClockRotateLeft} />
-          {isExtra && <span className={css('sidebar-text')}>TRUY XUẤT DỮ LIỆU</span>}
-        </NavLink>
-        <NavLink className={(nav) => css('sidebar-element', { active: nav.isActive })} to="/report">
-          <FontAwesomeIcon className={css('sidebar-icon')} icon={faChartSimple} />
-          {isExtra && <span className={css('sidebar-text')}>BÁO CÁO</span>}
-        </NavLink>
+        {roleOfPerson == 'admin' &&
+          privateRoutes.map((route, index) => {
+            return (
+              <NavLink
+                key={index}
+                className={(nav) => css('sidebar-element', { active: nav.isActive })}
+                to={route.path}
+              >
+                <FontAwesomeIcon className={css('sidebar-icon')} icon={listIconAdmin[index]} />
+                {isExtra && <span className={css('sidebar-text')}>{route.header}</span>}
+              </NavLink>
+            );
+          })}
+        {roleOfPerson == 'user' &&
+          publicRoutes.map((route, index) => {
+            return (
+              <NavLink
+                key={index}
+                className={(nav) => css('sidebar-element', { active: nav.isActive })}
+                to={route.path}
+              >
+                <FontAwesomeIcon className={css('sidebar-icon')} icon={listIconUser[index]} />
+                {isExtra && <span className={css('sidebar-text')}>{route.header}</span>}
+              </NavLink>
+            );
+          })}
       </div>
       <div className={css('body')}>
         <div className={css('header')}>{header}</div>

@@ -34,6 +34,32 @@
     }
   }
 
+  .info-project {
+    width: 80vw;
+    height: 26px;
+    font-size: 18px;
+    margin: 2vh auto 2vh auto;
+    font-weight: bold;
+    .info-project-title {
+      display: inline-block;
+      height: 100%;
+      padding-left: 8px;
+      min-width: 6vw;
+      line-height: 26px;
+      background-color: #137ac4;
+      border-radius: 8px;
+      color: #fff;
+      margin-right: 1.4vw;
+
+      &:nth-child(3) {
+        margin-left: 4vw;
+      }
+      &:nth-child(5) {
+        margin-left: 4vw;
+      }
+    }
+  }
+
   .project-table {
     width: 100%;
     height: auto;

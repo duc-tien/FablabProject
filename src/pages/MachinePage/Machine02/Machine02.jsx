@@ -18,14 +18,30 @@ function Machine02() {
       <div className={css('machine-info')}>
         <div className={css('machine-info-above')}>
           <div className={css('machine-info-detail')}>
-            <h1>Thông tin chi tiết</h1>
-            <div>ID máy</div>
-            <div>Tên máy: Máy khoan</div>
-            <div>Trạng thái: ON</div>
-            <div>Ngày làm việc: 01-01-2024</div>
-            <div>Mã chi tiết: fb01-abc</div>
-            <div>Nhân viên: Nguyễn A</div>
-            <div>Năng lượng: 20kW</div>
+            MC01-Máy khoan
+            <div className={css('content-inner')}>
+              <div>
+                <span className={css('content-inner-title')}>Trạng thái hoạt động: </span>
+                <span>ON</span>
+              </div>
+              <div>
+                <span className={css('content-inner-title')}>Năng lượng: </span>
+                <span>27kW</span>
+              </div>
+
+              <div>
+                <span className={css('content-inner-title')}>Nhân viên: </span>
+                <span>Nguyễn Văn A</span>
+              </div>
+              <div>
+                <span className={css('content-inner-title')}>Chi tiết gia công: </span>
+                <span>fb01-abc</span>
+              </div>
+              <div>
+                <span className={css('content-inner-title')}>Thời gian gia công:</span>
+                <span>00:37:02</span>
+              </div>
+            </div>
           </div>
           <div className={css('machine-info-oee')}>
             <div>OEE(%)</div>

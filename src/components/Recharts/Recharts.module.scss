@@ -1,0 +1,16 @@
+.chart {
+  margin-top: 3vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  span {
+    transform: translateX(2.7vw);
+  }
+}
+p {
+  width: 80px;
+  font-size: 14px;
+  transform: translateX(219%) translateY(-13px);
+  rotate: -90deg;
+}

@@ -1,2 +1,41 @@
-.homepage {
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  .slideshow {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    margin: auto 0 auto 0;
+    .activeSlide {
+      width: 100%;
+      height: 100%;
+    }
+    .leftBtn,
+    .rightBtn {
+      position: absolute;
+      color: #1488db;
+      width: 56px;
+      height: 56px;
+      top: 40vh;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3vw;
+      cursor: pointer;
+      &:hover {
+        background-color: #1488db;
+        color: #fff;
+      }
+    }
+
+    .rightBtn {
+      right: 1vw;
+    }
+    .leftBtn {
+      left: 1vw;
+    }
+  }
 }
