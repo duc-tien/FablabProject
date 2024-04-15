@@ -4,7 +4,7 @@ import MachinePage from "~/pages/MachinePage";
 import ProjectPage from "~/pages/ProjectPage";
 import UpdateProjectPage from "~/pages/UpdateProjectPage";
 import ReportPage from "~/pages/ReportPage";
-import OrderPage from "~/pages/OrderPage";
+import WorkerPage from "~/pages/WorkerPage";
 import Warehouse from "~/pages/Warehouse";
 
 const page={
@@ -14,7 +14,7 @@ const page={
     project:ProjectPage,
     updateproject:UpdateProjectPage,
     report:ReportPage,
-    order:OrderPage,
+    worker:WorkerPage,
     warehouse:Warehouse
 }
 

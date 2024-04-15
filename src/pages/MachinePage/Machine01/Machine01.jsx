@@ -18,33 +18,15 @@ function Machine01() {
   const [runTime, setRunTime] = useState('');
   const [netRunTime, setNetRunTime] = useState('');
   const [processTime, setProcessTime] = useState('');
-  const [storeTime, setStoreTime] = useState(1850000);
+  const [storeTime, setStoreTime] = useState(7200);
   const [timeStamp, setTimeStamp] = useState({
-    startRunTime: '',
+    startRunTime: '2024/04/09 07:05:00',
     endRunTime: '',
-    startProcessTime: '',
+    startProcessTime: '2024/04/09 09:35:00',
     endProcessTime: '',
   });
 
   const currentDate = new Date();
-
-  useEffect(() => {
-    hubConnection.start();
-    hubConnection.connection.on('TagChanged', (msg) => {
-      setTimeStamp((prev) => {
-        return {
-          startRunTime: msg.startRunTime,
-          endRunTime: msg.endRunTime,
-          startProcessTime: msg.startProcessTime,
-          endProcessTime: msg.endProcessTime,
-        };
-      });
-      setStoreTime(parseInt(msg.storeTime));
-    });
-    return () => {
-      hubConnection.connection.off('TagChanged');
-    };
-  }, [hubConnection.connection]);
 
   useEffect(() => {
     const myTimeout = setTimeout(() => {
@@ -52,9 +34,6 @@ function Machine01() {
       getRunTime(timeStamp.startRunTime, timeStamp.endRunTime);
       getNetRunTime(timeStamp.startProcessTime, timeStamp.endProcessTime);
       getProcessTime(timeStamp.startProcessTime, timeStamp.endProcessTime);
-      // getRunTime('2024/04/09 18:32:00', '');
-      // getNetRunTime('2024/04/09 15:46:00', '');
-      // getProcessTime('2024/04/09 15:46:00', '');
     }, 1000);
 
     return () => clearTimeout(myTimeout);
@@ -66,18 +45,26 @@ function Machine01() {
   };
   const getWorkTime = () => {
     const timeFormer = new Date();
-    const timeLater = new Date();
     timeFormer.setHours(7, 0, 0);
-    const timeDiff = timeLater.getTime() - timeFormer.getTime() + storeTime;
+    const timeLater = new Date();
+    const timeDiff = timeLater.getTime() - timeFormer.getTime();
+    //convert to hh:mm:ss
+    var seconds = Math.floor(timeDiff / 1000);
+    var minutes = Math.floor(seconds / 60);
+    var hours = Math.floor(minutes / 60);
+
+    seconds = formatTime(seconds % 60);
+    minutes = formatTime(minutes % 60);
+    hours = formatTime(hours % 24);
+    //
+    // if (timeDiff < 4 * 60 * 60 * 1000) {
+    //   setWorkTime(`${hours}:${minutes}:${seconds}`);
+    // } else if (timeDiff < 6 * 60 * 60 * 1000) {
+    //   setWorkTime(`04:00:00`);
+    // } else {
+    //   setWorkTime(`${hours - 2}:${minutes}:${seconds}`);
+    // }
     if (timeDiff < 8 * 60 * 60 * 1000) {
-      var seconds = Math.floor(timeDiff / 1000);
-      var minutes = Math.floor(seconds / 60);
-      var hours = Math.floor(minutes / 60);
-
-      seconds = formatTime(seconds % 60);
-      minutes = formatTime(minutes % 60);
-      hours = formatTime(hours % 24);
-
       setWorkTime(`${hours}:${minutes}:${seconds}`);
     } else {
       setWorkTime(`08:00:00`);
@@ -174,7 +161,7 @@ function Machine01() {
                 <span>27kW</span>
               </div>
               <div>
-                <span className={css('content-inner-title')}>Thời gian làm việc:</span>
+                <span className={css('content-inner-title')}>Thời gian ca làm việc:</span>
                 <span>{workTime}</span>
               </div>
               <div>

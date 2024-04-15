@@ -5,7 +5,7 @@ const path = {
     project:'/project',
     updateproject:'/updateproject',
     report:'/report',
-    order:'/order',
+    worker:'/worker',
     warehouse:'/warehouse'
 };
 

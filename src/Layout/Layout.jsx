@@ -34,13 +34,13 @@ function Layout({ children, header }) {
 
   const listIconAdmin = [
     faSliders,
-    // faNewspaper,
+    faNewspaper,
     faHardDrive,
     faUpload,
-    faDiagramProject,
+    // faDiagramProject,
     faClockRotateLeft,
     faCartShopping,
-    faChartSimple,
+    // faChartSimple,
   ];
   const listIconUser = [faSliders, faHardDrive, faDiagramProject, faClockRotateLeft, faChartSimple];
   return (

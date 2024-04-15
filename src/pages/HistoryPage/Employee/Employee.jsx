@@ -4,6 +4,8 @@ import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getWorker, getDetail, getMachine } from '~/services/getServices';
 import Alert from '~/components/Alert';
+import { listWorkerFake, stage } from '~/utils/fakeData';
+import noUser from '~/assets/imgs/noUser.jpg';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -20,13 +22,10 @@ function Employee() {
   const [currentWorker, setCurrentWorker] = useState('');
   const [currentWorkerInfo, setCurrentWorkerInfo] = useState({});
   const [historyOfWorker, setHistoryOfWorker] = useState([]);
+  const url = '';
 
   useEffect(() => {
-    const getDataInit = async () => {
-      const res = await getWorker();
-      setListWorkerInit(res);
-    };
-    getDataInit();
+    setListWorkerInit(listWorkerFake);
   }, []);
 
   const checkInput = () => {
@@ -58,27 +57,26 @@ function Employee() {
     const checkResult = checkInput();
     if (checkResult) {
       setCurrentWorkerInfo(worker);
-      const history = await getDetail({ workerId: worker.workerId });
-      let alterHistory = [];
-      for (const value of history) {
-        const [machine] = await getMachine(value.machineId);
-        alterHistory = [...alterHistory, { ...value, machineName: machine.machineName }];
-      }
+      const history = stage.filter((x) => x.workerId == worker.workerId);
 
-      if (startDate && endDate) {
-        setHistoryOfWorker((prev) => {
-          const filter = alterHistory.filter((e) => {
-            const compareTime = new Date(e.startTime);
-            const dateBefore = new Date(startDate);
-            const dateAfter = new Date(endDate);
-            const result = compareTime >= dateBefore && compareTime <= dateAfter;
-            return result;
-          });
-          return filter;
-        });
-      } else {
-        setHistoryOfWorker(alterHistory);
-      }
+      setHistoryOfWorker(history);
+
+      // if (startDate && endDate) {
+      //   setHistoryOfWorker((prev) => {
+      //     const filter = alterHistory.filter((e) => {
+      //       const compareTime = new Date(e.startTime);
+      //       const dateBefore = new Date(startDate);
+      //       dateBefore.setHours(7, 0, 0);
+      //       const dateAfter = new Date(endDate);
+      //       dateAfter.setHours(18, 0, 0);
+      //       const result = compareTime >= dateBefore && compareTime <= dateAfter;
+      //       return result;
+      //     });
+      //     return filter;
+      //   });
+      // } else {
+      //   setHistoryOfWorker(alterHistory);
+      // }
     }
   };
   const handleChange = (selectedOption) => {
@@ -128,11 +126,17 @@ function Employee() {
         <button onClick={() => getHistoryOfWorker(currentWorker)}>Truy xuất</button>
       </div>
       <h1>Thông tin truy xuất</h1>
-      <div className={css('info-worker')}>
-        <span>Mã nhân viên:</span>
-        <span>{currentWorkerInfo?.workerId}</span>
-        <span>Tên nhân viên:</span>
-        <span>{currentWorkerInfo?.workerName}</span>
+      <div className={css('info-container')}>
+        <img src={currentWorkerInfo?.avatar || noUser} className={css('worker-avatar')}></img>
+        <div className={css('worker-info')}>
+          <div>{currentWorkerInfo?.workerName}</div>
+          <div>
+            <b>Mã định danh :</b> {currentWorkerInfo?.workerId}
+          </div>
+          <div>
+            <b>Khu vực:</b> {currentWorkerInfo.area}
+          </div>
+        </div>
       </div>
       <table className={css('table-detail')}>
         <thead>
@@ -151,10 +155,10 @@ function Employee() {
               <tr key={index}>
                 <td>{e.detailId}</td>
                 {/* <td>{e.detailName}</td> */}
-                <td>{e.machineId}</td>
+                <td>{e.machineLabel}</td>
                 {/* <td>{e.machineName}</td> */}
-                <td>{e.startTime}</td>
-                <td>{`00:00:00`}</td>
+                <td>{e.startProcessTime}</td>
+                <td>{e.processTime}</td>
               </tr>
             );
           })}
@@ -166,18 +170,3 @@ function Employee() {
 }
 
 export default Employee;
-
-{
-  /* <select
-          value={currentWorker}
-          onChange={(e) => setCurrentWorker(e.target.value)}
-          className={css('select-input')}
-        >
-          {listWorkerInit?.map((wk, index) => {
-            return <option key={index} value={JSON.stringify(wk)}>{`${wk.workerId} - ${wk.workerName}`}</option>;
-          })}
-        </select> */
-}
-
-// const infoWorker = JSON.parse(currentWorker);
-// const history = await getDetail({ workerId: infoWorker.workerId });

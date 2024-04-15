@@ -147,6 +147,7 @@ function UpdateProjectPage() {
       };
       for (const value of dataExcel) {
         const imgBase64 = await fetchImage(value.imgURL);
+        console.log(imgBase64);
         tempProject.details = [
           ...tempProject.details,
           {
@@ -182,12 +183,12 @@ function UpdateProjectPage() {
 
   return (
     <div className={css('project')}>
-      <div className={css('project-info')}>
+      <div className={css('project-input')}>
         <h1>Cập nhật chi tiết dự án</h1>
         <label htmlFor="importExcel">Nhập dữ liệu</label>
         <input type="file" id="importExcel" hidden onChange={(e) => handleUpload(e)} />
       </div>
-      <div className={css('info-project')}>
+      <div className={css('project-info')}>
         <span className={css('info-project-title')}>Mã dự án:</span>
         <span>{dataExcel[0]?.projectId} </span>
         <span className={css('info-project-title')}>Tên dự án:</span>
@@ -216,7 +217,7 @@ function UpdateProjectPage() {
                   <td>{data.state}</td>
                   <td
                     onClick={() => {
-                      setImgURL(data['Ảnh chi tiết']);
+                      setImgURL(data.imgURL);
                       setISOpen(true);
                     }}
                   >

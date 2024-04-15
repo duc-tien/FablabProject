@@ -4,6 +4,7 @@ import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getProject, getDetail } from '~/services/getServices';
 import Loading from '~/components/Loading';
+import { listProjectFake, listDetailFake } from '~/utils/fakeData';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -49,21 +50,13 @@ function ProjectPage() {
   // };
 
   useEffect(() => {
-    const getDataInit = async () => {
-      const res = await getProject();
-      setListProject(res);
-      setCurrentProject(res[0].projectId);
-    };
-    getDataInit();
+    setListProject(listProjectFake);
   }, []);
 
   const getDetailOfProject = async (project) => {
-    setIsLoading(true);
-    const infoProject = await getProject(project.value);
-    const listDetailOfProject = await getDetail({ prjId: project.projectId });
-    setIsLoading(false);
-    setCurrentProjectInfo(infoProject[0]);
-    setListDetailFilter(listDetailOfProject);
+    const tempListDetail = listDetailFake.filter((x) => x.projectId == project.projectId);
+    setListDetailFilter(tempListDetail);
+    setCurrentProjectInfo(project);
   };
 
   const handleChange = (selectedOption) => {
@@ -75,7 +68,7 @@ function ProjectPage() {
       <div className={css('project-info')}>
         <div className={css('project-info-select')}>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <span className={css('span')}>Tên dự án</span>
+            <span className={css('span')}>Chọn dự án</span>
 
             <div style={{ width: '280px' }}>
               <Select
@@ -105,7 +98,6 @@ function ProjectPage() {
           <thead>
             <tr>
               <th>Mã chi tiết</th>
-              {/* <th>Tên chi tiết</th> */}
               <th>Ngày ban hành</th>
               <th>Kỳ vọng</th>
               <th>Trạng thái</th>
@@ -119,23 +111,12 @@ function ProjectPage() {
               return (
                 <tr key={index}>
                   <td>{detail.detailId}</td>
-                  {/* <td>{detail.detailName}</td> */}
                   <td>{detail.startTime}</td>
                   <td>{detail.endTime}</td>
-                  <td>{`Chưa gia công`}</td>
-                  <td>{`00:00:00`}</td>
+                  <td>{detail.detailStatus}</td>
+                  <td>{detail.processTime}</td>
                   <td>Chưa nhập kho</td>
-                  {/* <td
-                    onClick={() => {
-                      setImgURL(() => {
-                        const base64img = `data:image/jpeg;base64,${detail.fileData}`;
-                        return base64img;
-                      });
-                      setISOpen(true);
-                    }}
-                  >
-                    Xem chi tiết
-                  </td> */}
+                  <td>Xem chi tiết</td>
                 </tr>
               );
             })}

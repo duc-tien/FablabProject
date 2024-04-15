@@ -4,6 +4,8 @@ import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getDetail, getMachine, getProject, getWorker } from '~/services/getServices';
 import Alert from '~/components/Alert';
+import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
+import saveExcel from '~/utils/saveExcel';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -22,12 +24,9 @@ function Detail() {
   const [currentDetail, setCurrentDetail] = useState('');
   const [currentProject, setCurrentProject] = useState('');
   const [infoDetail, setInfoDetail] = useState({});
+  const [stageDetail, setStageDetail] = useState([]);
   useEffect(() => {
-    const getDataInit = async () => {
-      const listPInit = await getProject();
-      setListProject(listPInit);
-    };
-    getDataInit();
+    setListProject(listProjectFake);
   }, []);
 
   const cancelAlert = () => {
@@ -37,12 +36,9 @@ function Detail() {
     });
   };
   const getListDetailOfProject = async (selectedOption) => {
-    // setCurrentProject(prjId);
-    // const res = await getDetail({ prjId });
-    // setListDetail(res);
     setCurrentProject(selectedOption);
-    const res = await getDetail({ prjId: selectedOption.projectId });
-    setListDetail(res);
+    const tempListDetail = listDetailFake.filter((x) => x.projectId == selectedOption.projectId);
+    setListDetail(tempListDetail);
     setCurrentDetail('');
   };
 
@@ -67,17 +63,14 @@ function Detail() {
 
   const getInfoDetail = async (detail) => {
     const checkResult = checkInput();
+    const stageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
+    console.log(stageOfDetail);
+    setStageDetail(stageOfDetail);
     if (checkResult) {
-      const [machine] = await getMachine(detail.machineId);
-      const [worker] = await getWorker(detail.workerId);
-      const [project] = await getProject(detail.projectId);
-
       setInfoDetail(() => {
         return {
           ...detail,
-          machineName: machine.machineName,
-          workerName: worker.workerName,
-          projectName: project.projectName,
+          projectName: currentProject.projectName,
         };
       });
     }
@@ -85,6 +78,26 @@ function Detail() {
 
   const handleChange = (selectedOption) => {
     setCurrentDetail(selectedOption);
+  };
+
+  const saveFileExcel = () => {
+    const data = stageDetail.map((e) => {
+      return {
+        detailId: e.detailId,
+        machineId: e.machineId,
+        workerId: e.workerId,
+        processTime: e.processTime,
+      };
+    });
+
+    const headers = [
+      { header: 'Mã chi tiết', key: 'detailId', width: 20 },
+      { header: 'Vị trí máy', key: 'machineId', width: 20 },
+      { header: 'Mã công nhân', key: 'workerId', width: 20 },
+      { header: 'Thời gian gian công', key: 'processTime', width: 20 },
+    ];
+
+    saveExcel(headers, data);
   };
   return (
     <div className={css('container')}>
@@ -145,21 +158,24 @@ function Detail() {
           <span>Mã chi tiết:</span>
           <span>{infoDetail?.detailId}</span>
           <span>Mã dự án:</span>
-          <span>{infoDetail?.detailName}</span>
+          <span>{infoDetail?.projectId}</span>
           <span>Thời gian ban hành:</span>
-          <span>{}</span>
+          <span>{infoDetail.startTime}</span>
         </div>
         <div className={css('info-detail')}>
-          <span>Tên dự án:</span>
-          <span>{infoDetail?.projectId}</span>
           <span>Tên chi tiết:</span>
+          <span>{infoDetail?.detailName}</span>
+          <span>Tên dự án:</span>
           <span>{infoDetail?.projectName}</span>
           <span>Thời gian dự kiến kết thúc:</span>
-          <span>{}</span>
+          <span>{infoDetail?.endTime}</span>
         </div>
         <div className={css('info-detail')}>
           <span>Công đoạn dự kiến:</span>
-          <span>{` Tạo phôi --> Cắt gọt --> Mài --> Đánh bóng`}</span>
+          <span>{infoDetail?.stage}</span>
+        </div>
+        <div className={css('info-detail')}>
+          <span>Công đoạn đã qua:</span>
         </div>
       </div>
       <table className={css('table-detail')}>
@@ -172,18 +188,16 @@ function Detail() {
           </tr>
         </thead>
         <tbody>
-          {/* {historyOfMachine?.map((e, index) => {
+          {stageDetail?.map((e, index) => {
             return (
               <tr key={index}>
-                <td>{e.detailId}</td>
-                <td>{e.detailName}</td>
+                <td>{e.machineLabel}</td>
                 <td>{e.workerId}</td>
-                <td>{e.workerName}</td>
-                <td>{e.startTime}</td>
-                <td>{`00:00:00`}</td>
+                <td>{e.startProcessTime}</td>
+                <td>{e.processTime}</td>
               </tr>
             );
-          })} */}
+          })}
         </tbody>
       </table>
       {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
