@@ -11,14 +11,14 @@ import {
   } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
 import hobbyReducer from "./hobbySlice";
-import displayReducer from './displaySlice'
+import authReducer from './authSlice'
 import projectReducer from "./projectSlice";
 
 
   
 const rootReducer=combineReducers({
       hobby:hobbyReducer,
-      display:displayReducer,
+      auth:authReducer,
       project:projectReducer
     })
 

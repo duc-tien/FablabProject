@@ -4,10 +4,9 @@ import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getMachine, getDetail, getWorker } from '~/services/getServices';
 import Alert from '~/components/Alert';
-import { listDetailFake, listMachineFake, listProjectFake, stage } from '~/utils/fakeData';
-import { data2 } from '~/utils/fakeoee';
+import { listDetailFake, listMachineFake, listProjectFake, stage, oeeFake } from '~/utils/fakeData';
 import Recharts from '~/components/Recharts';
-
+import saveExcel from '~/utils/saveExcel';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -34,13 +33,13 @@ function Machine() {
     },
     {
       value: 2,
-      label: 'OEE, Năng lượng',
+      label: 'Dữ liệu OEE, Năng lượng',
     },
   ];
 
   useEffect(() => {
     setListMCInit(listMachineFake);
-    setDataoee(data2);
+    setDataoee(oeeFake);
   }, []);
 
   const checkInput = () => {
@@ -69,9 +68,9 @@ function Machine() {
   };
 
   const getHistoryOfMachine = async (machine, info) => {
-    const resultCheck = checkInput();
+    // const resultCheck = checkInput();
 
-    if (resultCheck) {
+    if (true) {
       setCurrentMachineInfo(machine);
       setView(info.value);
       const history = stage.filter((x) => x.machineId == machine.machineId);
@@ -102,6 +101,38 @@ function Machine() {
     setCurInfo(selectedOption);
   };
 
+  const saveFileExcel = () => {
+    let data, headers, name;
+    if (view == 1) {
+      data = historyOfMachine.map((e) => {
+        return {
+          detailId: e.detailId,
+          workerId: e.workerId,
+          startProcessTime: e.startProcessTime,
+          processTime: e.processTime,
+        };
+      });
+
+      headers = [
+        { header: 'Mã chi tiết', key: 'detailId', width: 20 },
+        { header: 'Mã nhân viên', key: 'workerId', width: 20 },
+        { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
+        { header: 'Thời gian gia công', key: 'processTime', width: 20 },
+      ];
+
+      name = `Lịch sử máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
+    } else {
+      data = dataoee;
+      headers = [
+        { header: 'Thời gian', key: 'timeStamp', width: 20 },
+        { header: 'OEE', key: 'oee', width: 20 },
+        { header: 'Năng lượng', key: 'energy', width: 20 },
+      ];
+      name = `Dữ liệu OEE, Năng lượng máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
+    }
+
+    saveExcel(headers, data, name);
+  };
   return (
     <div className={css('container')}>
       <div className={css('select-area')}>
@@ -171,6 +202,7 @@ function Machine() {
         <span>{currentMachineInfo?.machineId}</span>
         <span>Tên máy :</span>
         <span>{currentMachineInfo?.machineName}</span>
+        <button onClick={saveFileExcel}>Xuat excel</button>
       </div>
       {view == 1 && (
         <table className={css('table-detail')}>

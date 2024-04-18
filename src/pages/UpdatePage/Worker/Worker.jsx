@@ -1,5 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
-import style from './WorkerPage.module.scss';
+import style from './Worker.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import instance from '~/utils/api';
@@ -14,7 +14,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
-function WorkerPage() {
+function Worker() {
   const [alert, setAlert] = useState({ isAlert: false, content: '' });
   const [base64Image, setBase64Image] = useState('');
   const [listWorker, setListWorker] = useState([]);
@@ -24,6 +24,7 @@ function WorkerPage() {
     workerName: '',
     area: '',
     avatar: '',
+    rfid: '',
   });
   const [isOpen, setISOpen] = useState(false);
   const [imgURL, setImgURL] = useState('');
@@ -71,7 +72,7 @@ function WorkerPage() {
     <div className={css('container')}>
       <div className={css('manage-worker')}>
         <div className={css('add-worker')}>
-          <span>Thêm thông tin công nhân</span>
+          <span>Thêm công nhân</span>
           <div className={css('worker-field')}>Mã định danh:</div>
           <input
             value={infoWorkerAdd?.workerId}
@@ -89,6 +90,13 @@ function WorkerPage() {
           <div className={css('worker-field')}>Khu vực:</div>
           <input
             value={infoWorkerAdd?.area}
+            onChange={(e) => createInfoWorker('area', e.target.value)}
+            className={css('worker-info')}
+            type="text"
+          />
+          <div className={css('worker-field')}>Mã RFID:</div>
+          <input
+            value={infoWorkerAdd?.rfid}
             onChange={(e) => createInfoWorker('area', e.target.value)}
             className={css('worker-info')}
             type="text"
@@ -137,6 +145,13 @@ function WorkerPage() {
                 };
               });
             }}
+          />
+          <div className={css('worker-field')}>Mã RFID:</div>
+          <input
+            value={infoWorkerAdd?.rfid}
+            onChange={(e) => createInfoWorker('area', e.target.value)}
+            className={css('worker-info')}
+            type="text"
           />
           <div onClick={handleChangeInfoWorker} className={css('btn-save')}>
             Lưu thay đổi
@@ -200,4 +215,4 @@ function WorkerPage() {
   );
 }
 
-export default WorkerPage;
+export default Worker;

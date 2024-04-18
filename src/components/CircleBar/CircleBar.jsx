@@ -1,6 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './CircleBar.module.scss';
-import { displayModalLogin } from '~/redux/displaySlice';
 import { login } from '~/services/loginService';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import { useState } from 'react';
@@ -11,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const css = classNames.bind(style);
 function CircleBar({ netRunTime, runTime, workTime }) {
   let percent = 0;
+  let color;
   if (netRunTime && runTime && workTime) {
     const eNetRunTime = netRunTime.split(':');
     const eRunTime = runTime.split(':');
@@ -21,10 +21,19 @@ function CircleBar({ netRunTime, runTime, workTime }) {
     const tWorkTime = parseInt(eWorkTime[0]) * 3600 + parseInt(eWorkTime[1]) * 60 + parseInt(eWorkTime[2]);
     percent = ((((tRunTime / tWorkTime) * tNetRunTime) / tRunTime) * 100).toFixed(2);
   }
+
+  if (percent < 50) {
+    color = 'red';
+  } else if (50 <= percent && percent < 80) {
+    color = 'orange';
+  } else {
+    color = '#00aa11';
+  }
+
   return (
     <div
       style={{
-        background: `conic-gradient(from 0deg, #1488DB 0deg, #1488DB ${(percent / 100) * 360}deg, #ccc ${
+        background: `conic-gradient(from 0deg, ${color} 0deg, ${color} ${(percent / 100) * 360}deg, #ccc ${
           (percent / 100) * 360
         }deg, #ccc 360deg)`,
       }}

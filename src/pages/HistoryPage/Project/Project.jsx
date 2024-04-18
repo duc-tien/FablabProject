@@ -6,6 +6,7 @@ import { getDetail, getMachine, getProject, getWorker } from '~/services/getServ
 import Alert from '~/components/Alert';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import Loading from '~/components/Loading';
+import saveExcel from '~/utils/saveExcel';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -36,6 +37,8 @@ function Project() {
   const handleChange = (selectedOption) => {
     setCurrentProject(selectedOption);
   };
+
+  const saveFileExcel = () => {};
   return (
     <div className={css('container')}>
       <div className={css('select-area')}>
@@ -65,6 +68,7 @@ function Project() {
           <span>{currentProjectInfo?.projectId}</span>
           <span>Tên dự án:</span>
           <span>{currentProjectInfo?.projectName}</span>
+          <button onClick={saveFileExcel}>Xuất excel</button>
         </div>
       </div>
       <table className={css('table-detail')}>

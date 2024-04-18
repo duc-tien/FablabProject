@@ -1,15 +1,15 @@
 .container {
-  height: 100%;
+  height: auto;
   width: 100%;
   border: 1px solid #fff;
 
   .manage-worker {
     width: 72%;
-    height: 350px;
+    height: 400px;
     border-bottom: 3px solid #d1d1d1;
     border-right: 3px solid #d1d1d1;
     border-left: 3px solid #d1d1d1;
-    margin: 0 auto 0 auto;
+    margin: 16px auto 0 auto;
     display: flex;
     justify-content: center;
 
@@ -94,7 +94,7 @@
       }
 
       .mini-img {
-        height: 200px;
+        height: 250px;
         margin-top: 8px;
       }
     }
@@ -108,7 +108,7 @@
 
   .table-detail {
     width: 80vw;
-    margin: 2vh auto 0 auto;
+    margin: 2vh auto 8vh auto;
     th {
       text-align: left;
       background-color: #137ac4;

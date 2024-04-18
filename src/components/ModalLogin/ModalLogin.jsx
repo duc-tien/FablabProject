@@ -1,6 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './ModalLogin.module.scss';
-import { displayModalLogin } from '~/redux/displaySlice';
 import { login } from '~/services/loginService';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import { useState } from 'react';
@@ -15,14 +14,12 @@ function ModalLogin({ classname }) {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
 
-  const isLoginAgain = useSelector((state) => state.display.isLogin);
   const cln = css(classname, 'overlay');
 
   const handleLogin = async () => {
     const res = await login(username, password);
     if (typeof res === 'string') {
       localStorage.setItem('token', res);
-      dispatch(displayModalLogin(false));
       window.location.reload();
     }
   };

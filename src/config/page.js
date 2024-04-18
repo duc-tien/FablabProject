@@ -1,21 +1,17 @@
 import HistoryPage from "~/pages/HistoryPage";
 import HomePage from "~/pages/HomePage";
 import MachinePage from "~/pages/MachinePage";
-import ProjectPage from "~/pages/ProjectPage";
-import UpdateProjectPage from "~/pages/UpdateProjectPage";
-import ReportPage from "~/pages/ReportPage";
-import WorkerPage from "~/pages/WorkerPage";
+import UpdatePage from "~/pages/UpdatePage";
 import Warehouse from "~/pages/Warehouse";
+import MaintenancePage from "~/pages/MaintenancePage";
 
 const page={
     home:HomePage,
     history:HistoryPage,
     machine:MachinePage,
-    project:ProjectPage,
-    updateproject:UpdateProjectPage,
-    report:ReportPage,
-    worker:WorkerPage,
-    warehouse:Warehouse
+    update:UpdatePage,
+    warehouse:Warehouse,
+    maintenance:MaintenancePage
 }
 
 export default page

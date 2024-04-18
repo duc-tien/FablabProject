@@ -1,6 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Loading.module.scss';
-import { displayModalLogin } from '~/redux/displaySlice';
 import { login } from '~/services/loginService';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import { useEffect, useState } from 'react';

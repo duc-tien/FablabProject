@@ -85,6 +85,32 @@
       line-height: 8vh;
       font-size: 32px;
       cursor: default;
+      position: relative;
+
+      .info-user {
+        position: absolute;
+        height: 8vh;
+        min-width: 8vw;
+        text-align: center;
+        line-height: 8vh;
+        top: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        .avatar-user {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: #ccc;
+          line-height: 40px;
+          overflow: hidden;
+          .icon-user {
+            position: relative;
+            top: 3px;
+            font-size: 32px;
+          }
+        }
+      }
     }
     .sub-body {
       width: 100%;

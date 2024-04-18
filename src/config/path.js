@@ -2,11 +2,9 @@ const path = {
     home: '/',
     history:'/history',
     machine:'/machine',
-    project:'/project',
-    updateproject:'/updateproject',
-    report:'/report',
-    worker:'/worker',
-    warehouse:'/warehouse'
+    update:'/update',
+    warehouse:'/warehouse',
+    maintenance:'/maintenance'
 };
 
 export default path;

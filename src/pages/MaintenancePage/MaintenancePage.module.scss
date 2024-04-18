@@ -2,18 +2,6 @@
   width: 100%;
   height: 100%;
   border: 1px solid #fff;
-  position: relative;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #555;
-    border-radius: 4px;
-  }
   .select-area {
     display: flex;
     margin-top: 3vh;
@@ -36,7 +24,7 @@
 
     button {
       color: #fff;
-      width: 100px;
+      width: 200px;
       height: 100%;
       background-color: #6286b1;
       margin-left: 3vw;
@@ -51,8 +39,9 @@
   }
   .table-detail {
     width: 80vw;
-    margin: 2vh auto 6vh auto;
+    margin: 2vh auto 0 auto;
     th {
+      text-align: left;
       background-color: #137ac4;
       color: white;
     }
@@ -69,27 +58,38 @@
 
     td,
     th {
-      text-align: center;
       border: 1px solid #ddd;
       padding: 4px;
     }
   }
 
-  .backtop {
-    position: fixed;
-    right: 3%;
-    top: 90%;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+  .info-detail {
+    width: 80vw;
+    height: 32px;
+    font-size: 18px;
+    margin: 2vh auto 2vh auto;
+    font-weight: bold;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #137ac4;
-    cursor: pointer;
-    .icon-up {
-      font-size: 30px;
-      color: #fff;
+    span {
+      display: inline-block;
+      height: 32px;
+      line-height: 32px;
+
+      &:nth-child(odd) {
+        // background-color: #137ac4;
+        min-width: 10vw;
+        border-radius: 8px;
+        margin-right: 1.4vw;
+        color: #137ac4;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      &:nth-child(even) {
+        // background-color: #137ac4;
+        min-width: 8vw;
+        margin-right: 5vw;
+      }
     }
   }
 }

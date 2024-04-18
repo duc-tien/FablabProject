@@ -1,5 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
-import style from './UpdateProjectPage.module.scss';
+import style from './UpdateProject.module.scss';
 import { addDetailToList } from '~/redux/projectSlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import hubConnection from '~/utils/hubConnection';
@@ -15,7 +15,7 @@ import * as XLSX from 'xlsx';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
-function UpdateProjectPage() {
+function UpdateProject() {
   // useEffect(() => {
   //   hubConnection.start();
   //   hubConnection.connection.send('SendAllTag');
@@ -249,4 +249,4 @@ function UpdateProjectPage() {
   );
 }
 
-export default UpdateProjectPage;
+export default UpdateProject;

@@ -6,6 +6,7 @@ import { getWorker, getDetail, getMachine } from '~/services/getServices';
 import Alert from '~/components/Alert';
 import { listWorkerFake, stage } from '~/utils/fakeData';
 import noUser from '~/assets/imgs/noUser.jpg';
+import saveExcel from '~/utils/saveExcel';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -54,8 +55,8 @@ function Employee() {
   };
 
   const getHistoryOfWorker = async (worker) => {
-    const checkResult = checkInput();
-    if (checkResult) {
+    // const checkResult = checkInput();
+    if (true) {
       setCurrentWorkerInfo(worker);
       const history = stage.filter((x) => x.workerId == worker.workerId);
 
@@ -82,7 +83,38 @@ function Employee() {
   const handleChange = (selectedOption) => {
     setCurrentWorker(selectedOption);
   };
+  const saveFileExcel = () => {
+    let data, headers, name;
+    if (true) {
+      data = historyOfWorker.map((e) => {
+        return {
+          detailId: e.detailId,
+          machineId: e.machineId,
+          startProcessTime: e.startProcessTime,
+          processTime: e.processTime,
+        };
+      });
 
+      headers = [
+        { header: 'Mã chi tiết', key: 'detailId', width: 20 },
+        { header: 'Vị trí máy', key: 'machineId', width: 20 },
+        { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
+        { header: 'Thời gian gia công', key: 'processTime', width: 20 },
+      ];
+
+      name = `Lịch sử làm việc ${currentWorkerInfo.workerId}-${currentWorkerInfo.workerName} từ ${startDate} đến ${endDate}`;
+    } else {
+      data = dataoee;
+      headers = [
+        { header: 'Thời gian', key: 'timeStamp', width: 20 },
+        { header: 'OEE', key: 'oee', width: 20 },
+        { header: 'Năng lượng', key: 'energy', width: 20 },
+      ];
+      name = `Dữ liệu OEE, Năng lượng máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
+    }
+
+    saveExcel(headers, data, name);
+  };
   return (
     <div className={css('container')}>
       <div className={css('select-area')}>
@@ -125,6 +157,7 @@ function Employee() {
         </div>
         <button onClick={() => getHistoryOfWorker(currentWorker)}>Truy xuất</button>
       </div>
+
       <h1>Thông tin truy xuất</h1>
       <div className={css('info-container')}>
         <img src={currentWorkerInfo?.avatar || noUser} className={css('worker-avatar')}></img>
@@ -137,6 +170,9 @@ function Employee() {
             <b>Khu vực:</b> {currentWorkerInfo.area}
           </div>
         </div>
+      </div>
+      <div className={css('export-excel')}>
+        <button onClick={saveFileExcel}>Xuat excel</button>
       </div>
       <table className={css('table-detail')}>
         <thead>

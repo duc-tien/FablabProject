@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { displayModalLogin } from "../redux/displaySlice";
+import { displayModalLogin } from "../redux/authSlice";
 import { jwtDecode } from "jwt-decode";
 
 // Kiểm tra xem localStorage có token hay không, nếu có thì còn hiệu lực hay không

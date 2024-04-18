@@ -1,16 +1,6 @@
 .project {
-  height: 100%;
+  height: auto;
   width: 100%;
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #555;
-    border-radius: 4px;
-  }
 
   .project-input {
     width: 100%;

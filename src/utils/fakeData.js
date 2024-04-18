@@ -215,6 +215,7 @@ export const listWorkerFake = [
         area:'Khu vực khoan',
         avatar:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGLSmV0orv1Lom6_-7yX6Z-kpM3SVontyfvPTLgKlILg&s'
     },
+    
     {
         workerId:2014525,
         workerName:'Nguyễn Văn C',
@@ -378,3 +379,81 @@ export const stage=[
 
     
 ]
+
+export const oeeFake = [
+    {
+      timeStamp: '01-03-2024',
+      oee: 80,
+      energy: 80,
+    },
+    {
+      timeStamp: '02-03-2024',
+      oee: 81,
+      energy: 81,
+    },
+    {
+      timeStamp: '03-03-2024',
+      oee: 83,
+      energy: 83,
+    },
+    {
+      timeStamp: '04-03-2024',
+      oee: 88,
+      energy: 88,
+    },
+    {
+      timeStamp: '05-03-2024',
+      oee: 82,
+      energy: 82,
+    },
+    {
+      timeStamp: '06-03-2024',
+      oee: 88,
+      energy: 88,
+    },
+    {
+      timeStamp: '07-03-2024',
+      oee: 83,
+      energy: 83,
+    },
+    {
+      timeStamp: '08-03-2024',
+      oee: 80,
+      energy: 80,
+    },
+    {
+      timeStamp: '09-03-2024',
+      oee: 88,
+      energy: 88,
+    },
+    {
+      timeStamp: '10-03-2024',
+      oee: 80,
+      energy: 80,
+    },
+    {
+      timeStamp: '11-03-2024',
+      oee: 79,
+      energy: 79,
+    },
+    {
+      timeStamp: '12-03-2024',
+      oee: 83,
+      energy: 83,
+    },
+    
+  ];
+
+  export const listUser = [
+
+    {
+      userName:'admin',
+      password:'admin',
+      role:'admin'
+    },
+    {
+      userName:'user',
+      password:'user',
+      role:'user'
+    },
+  ]
