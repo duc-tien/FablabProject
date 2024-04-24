@@ -7,6 +7,7 @@ import Alert from '~/components/Alert';
 import { listWorkerFake, stage } from '~/utils/fakeData';
 import noUser from '~/assets/imgs/noUser.jpg';
 import saveExcel from '~/utils/saveExcel';
+import calculateTime from '~/utils/calculateTime';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -58,8 +59,14 @@ function Employee() {
     // const checkResult = checkInput();
     if (true) {
       setCurrentWorkerInfo(worker);
-      const history = stage.filter((x) => x.workerId == worker.workerId);
-
+      const tempHistory = stage.filter((x) => x.workerId == worker.workerId);
+      const history = tempHistory.map((e) => {
+        const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+        return {
+          ...e,
+          processTime: processTime,
+        };
+      });
       setHistoryOfWorker(history);
 
       // if (startDate && endDate) {
@@ -172,7 +179,7 @@ function Employee() {
         </div>
       </div>
       <div className={css('export-excel')}>
-        <button onClick={saveFileExcel}>Xuat excel</button>
+        <button onClick={saveFileExcel}>Xuất excel</button>
       </div>
       <table className={css('table-detail')}>
         <thead>

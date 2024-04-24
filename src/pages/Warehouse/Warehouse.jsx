@@ -1,6 +1,7 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Warehouse.module.scss';
-import { getDetail, getMachine, getProject, getWorker } from '~/services/getServices';
+import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
+
 import Alert from '~/components/Alert';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
@@ -14,18 +15,12 @@ const css = classNames.bind(style);
 
 function Warehouse() {
   const [alert, setAlert] = useState({ isAlert: false, content: '' });
-
   const [listProject, setListProject] = useState([]);
   const [listDetail, setListDetail] = useState([]);
   const [currentDetail, setCurrentDetail] = useState('');
   const [currentProject, setCurrentProject] = useState('');
-  const [infoDetail, setInfoDetail] = useState({});
   useEffect(() => {
-    const getDataInit = async () => {
-      const listPInit = await getProject();
-      setListProject(listPInit);
-    };
-    getDataInit();
+    setListProject(listProjectFake);
   }, []);
 
   const cancelAlert = () => {
@@ -36,8 +31,8 @@ function Warehouse() {
   };
   const getListDetailOfProject = async (selectedOption) => {
     setCurrentProject(selectedOption);
-    const res = await getDetail({ prjId: selectedOption.projectId });
-    setListDetail(res);
+    const tempListDetail = listDetailFake.filter((x) => x.projectId == selectedOption.projectId);
+    setListDetail(tempListDetail);
     setCurrentDetail('');
   };
 
@@ -53,7 +48,7 @@ function Warehouse() {
     if (!currentDetail) {
       setAlert({
         isAlert: true,
-        content: 'Vui lòng chọn chi tiết muốn nhập kho',
+        content: 'Vui lòng chọn chi tiết muốn tra cứu',
       });
       return false;
     }
@@ -62,17 +57,14 @@ function Warehouse() {
 
   const getInfoDetail = async (detail) => {
     const checkResult = checkInput();
+    const stageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
+    console.log(stageOfDetail);
+    setStageDetail(stageOfDetail);
     if (checkResult) {
-      const [machine] = await getMachine(detail.machineId);
-      const [worker] = await getWorker(detail.workerId);
-      const [project] = await getProject(detail.projectId);
-
       setInfoDetail(() => {
         return {
           ...detail,
-          machineName: machine.machineName,
-          workerName: worker.workerName,
-          projectName: project.projectName,
+          projectName: currentProject.projectName,
         };
       });
     }
@@ -81,6 +73,7 @@ function Warehouse() {
   const handleChange = (selectedOption) => {
     setCurrentDetail(selectedOption);
   };
+
   return (
     <div className={css('container')}>
       <div className={css('select-area')}>
@@ -132,7 +125,7 @@ function Warehouse() {
           />
         </div>
 
-        <button onClick={() => getInfoDetail(currentDetail)}>Xác nhận nhập kho</button>
+        <button onClick={() => getInfoDetail(currentDetail)}>Xác nhận hoàn thành</button>
       </div>
 
       {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}

@@ -2,21 +2,20 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
 export const projectSlice = createSlice({
-    name:'detailProject',
+    name:'project',
     initialState:{
-        listDetail:[]
+        currentMachineId:'MC'
     },
     reducers:{
-        addDetailToList:(state,action)=>{
-            const tempListDetail = [...state.listDetail,action.payload]
-            state.listDetail=tempListDetail
+        activeMachine:(state,action)=>{
+            state.currentMachineId=action.payload
         }
     },
    
     
 })
 
-export const {addDetailToList}=projectSlice.actions;
+export const {activeMachine}=projectSlice.actions;
 export default projectSlice.reducer;
 
 

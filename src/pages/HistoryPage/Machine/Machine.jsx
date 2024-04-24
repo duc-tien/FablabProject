@@ -7,6 +7,7 @@ import Alert from '~/components/Alert';
 import { listDetailFake, listMachineFake, listProjectFake, stage, oeeFake } from '~/utils/fakeData';
 import Recharts from '~/components/Recharts';
 import saveExcel from '~/utils/saveExcel';
+import calculateTime from '~/utils/calculateTime';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -34,6 +35,10 @@ function Machine() {
     {
       value: 2,
       label: 'Dữ liệu OEE, Năng lượng',
+    },
+    {
+      value: 3,
+      label: 'Dữ liệu lỗi',
     },
   ];
 
@@ -73,7 +78,14 @@ function Machine() {
     if (true) {
       setCurrentMachineInfo(machine);
       setView(info.value);
-      const history = stage.filter((x) => x.machineId == machine.machineId);
+      const tempHistory = stage.filter((x) => x.machineId == machine.machineId);
+      const history = tempHistory.map((e) => {
+        const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+        return {
+          ...e,
+          processTime: processTime,
+        };
+      });
       setHistoryOfMachine(history);
 
       //   if (startDate && endDate) {
@@ -202,7 +214,7 @@ function Machine() {
         <span>{currentMachineInfo?.machineId}</span>
         <span>Tên máy :</span>
         <span>{currentMachineInfo?.machineName}</span>
-        <button onClick={saveFileExcel}>Xuat excel</button>
+        <button onClick={saveFileExcel}>Xuất excel</button>
       </div>
       {view == 1 && (
         <table className={css('table-detail')}>

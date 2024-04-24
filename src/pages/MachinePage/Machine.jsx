@@ -8,42 +8,63 @@ import machine3 from '~/assets/imgs/machine3.png';
 import machine4 from '~/assets/imgs/machine4.png';
 import SemiCircleBar from '~/components/SemiCircleBar';
 import CircleBar from '~/components/CircleBar';
+import { listAreaFake, stage } from '~/utils/fakeData';
+import calculateTime from '~/utils/calculateTime';
+import calculateSumTime from '~/utils/calculateSumTime';
+import { activeMachine } from '~/redux/projectSlice';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import axios from 'axios';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function Machine() {
+  const dispatch = useDispatch();
+  const [listArea, setListArea] = useState([]);
+  const [currentArea, setCurrentArea] = useState('');
+  const [currentMachineId, setCurrentMachineId] = useState('');
   const [machineImage, setMachineImage] = useState();
   const [machineSelected, setMachineSelected] = useState();
   const [workTime, setWorkTime] = useState('');
   const [runTime, setRunTime] = useState('');
   const [netRunTime, setNetRunTime] = useState('');
   const [processTime, setProcessTime] = useState('');
-  const [storeTime, setStoreTime] = useState(7200);
+  const [storeTime, setStoreTime] = useState();
   const [timeStamp, setTimeStamp] = useState({
-    startRunTime: '2024/04/09 07:05:00',
+    startRunTime: '',
     endRunTime: '',
-    startProcessTime: '2024/04/09 09:35:00',
+    startProcessTime: '',
     endProcessTime: '',
   });
+  useEffect(() => {
+    hubConnection.start();
+    hubConnection.connection.on('TagChanged', (msg) => {
+      if (msg.machine == currentMachineId) {
+        setTimeStamp({
+          startRunTime: msg.startRunTime,
+          endRunTime: msg.endRunTime,
+          startProcessTime: msg.startProcessTime,
+          endProcessTime: msg.endProcessTime,
+        });
+      }
+    });
+    return () => {
+      hubConnection.connection.off('TagChanged');
+    };
+  }, [hubConnection.connection, currentMachineId]);
+
   const options = [
-    { value: 'machine1', label: 'MC01-Máy số 1', image: machine1 },
-    { value: 'machine2', label: 'MC01-Máy số 2', image: machine2 },
-    { value: 'machine3', label: 'MC03-Máy số 3', image: machine3 },
-    { value: 'machine4', label: 'MC01-Máy số 4', image: machine4 },
+    { value: 'MC01', label: 'MC01-Máy số 1', image: machine1 },
+    { value: 'MC02', label: 'MC02-Máy số 2', image: machine2 },
   ];
   const currentDate = new Date();
-  const handleChange = (selectedOption) => {
-    setMachineSelected(selectedOption);
-  };
-  const displayMachineInfomation = () => {
-    setMachineImage(machineSelected?.image);
-  };
 
+  useEffect(() => {
+    setListArea(listAreaFake);
+  }, []);
   useEffect(() => {
     const myTimeout = setTimeout(() => {
       getWorkTime();
@@ -53,7 +74,7 @@ function Machine() {
     }, 1000);
 
     return () => clearTimeout(myTimeout);
-  }, [workTime]);
+  }, [workTime, timeStamp, runTime, netRunTime]);
 
   const formatTime = (time) => {
     if (time < 10) time = '0' + time;
@@ -64,7 +85,7 @@ function Machine() {
     timeFormer.setHours(7, 0, 0);
     const timeLater = new Date();
     const timeDiff = timeLater.getTime() - timeFormer.getTime();
-    //convert to hh:mm:ss
+
     var seconds = Math.floor(timeDiff / 1000);
     var minutes = Math.floor(seconds / 60);
     var hours = Math.floor(minutes / 60);
@@ -72,14 +93,6 @@ function Machine() {
     seconds = formatTime(seconds % 60);
     minutes = formatTime(minutes % 60);
     hours = formatTime(hours % 24);
-    //
-    // if (timeDiff < 4 * 60 * 60 * 1000) {
-    //   setWorkTime(`${hours}:${minutes}:${seconds}`);
-    // } else if (timeDiff < 6 * 60 * 60 * 1000) {
-    //   setWorkTime(`04:00:00`);
-    // } else {
-    //   setWorkTime(`${hours - 2}:${minutes}:${seconds}`);
-    // }
     if (timeDiff < 8 * 60 * 60 * 1000) {
       setWorkTime(`${hours}:${minutes}:${seconds}`);
     } else {
@@ -87,92 +100,73 @@ function Machine() {
     }
   };
   const getRunTime = (startTime, endTime) => {
-    if (startTime) {
-      const timeFormer = new Date(startTime);
-      let timeLater;
-      if (endTime) {
-        timeLater = new Date(endTime);
-      } else {
-        timeLater = new Date();
-      }
-      const timeDiff = timeLater.getTime() - timeFormer.getTime();
-      var seconds = Math.floor(timeDiff / 1000);
-      var minutes = Math.floor(seconds / 60);
-      var hours = Math.floor(minutes / 60);
-
-      seconds = formatTime(seconds % 60);
-      minutes = formatTime(minutes % 60);
-      hours = formatTime(hours % 24);
-
-      setRunTime(`${hours}:${minutes}:${seconds}`);
-    } else {
-      setRunTime(`00:00:00`);
-    }
+    const duration = calculateTime(startTime, endTime, 0);
+    setRunTime(duration);
   };
   const getNetRunTime = (startTime, endTime) => {
-    if (startTime) {
-      const timeFormer = new Date(startTime);
-      let timeLater;
-      if (endTime) {
-        timeLater = new Date(endTime);
-      } else {
-        timeLater = new Date();
-      }
-      const timeDiff = timeLater.getTime() - timeFormer.getTime() + storeTime * 1000;
-      var seconds = Math.floor(timeDiff / 1000);
-      var minutes = Math.floor(seconds / 60);
-      var hours = Math.floor(minutes / 60);
-
-      seconds = formatTime(seconds % 60);
-      minutes = formatTime(minutes % 60);
-      hours = formatTime(hours % 24);
-
-      setNetRunTime(`${hours}:${minutes}:${seconds}`);
-    } else {
-      setNetRunTime(`00:00:00`);
-    }
+    const duration = calculateTime(startTime, endTime, storeTime);
+    setNetRunTime(duration);
   };
   const getProcessTime = (startTime, endTime) => {
-    if (startTime) {
-      const timeFormer = new Date(startTime);
-      let timeLater;
-      if (endTime) {
-        timeLater = new Date(endTime);
-      } else {
-        timeLater = new Date();
-      }
-      const timeDiff = timeLater.getTime() - timeFormer.getTime();
-      var seconds = Math.floor(timeDiff / 1000);
-      var minutes = Math.floor(seconds / 60);
-      var hours = Math.floor(minutes / 60);
-
-      seconds = formatTime(seconds % 60);
-      minutes = formatTime(minutes % 60);
-      hours = formatTime(hours % 24);
-
-      setProcessTime(`${hours}:${minutes}:${seconds}`);
-    } else {
-      setProcessTime(`00:00:00`);
-    }
+    const duration = calculateTime(startTime, endTime, 0);
+    setProcessTime(duration);
   };
+
+  const getListMachineOfProject = async (selectedOption) => {
+    setCurrentArea(selectedOption);
+  };
+  const handleChange = (selectedOption) => {
+    setMachineSelected(selectedOption);
+  };
+
+  const displayMachineInfomation = async () => {
+    setMachineImage(machineSelected?.image);
+    setCurrentMachineId(machineSelected?.value);
+    const tempList = stage.filter((x) => x.machineId == machineSelected.value);
+    const list = tempList.map((e) => {
+      return {
+        startTimeStamp: e.startProcessTime,
+        endTimeStamp: e.endProcessTime,
+      };
+    });
+    const accumulateTime = calculateSumTime(list);
+    setStoreTime(accumulateTime);
+
+    const { data } = await axios.get('https://localhost:7245/Message');
+    const singalRMachine = data.find((e) => {
+      return e.machine == machineSelected.value;
+    });
+
+    setTimeStamp({
+      startRunTime: singalRMachine.startRunTime,
+      endRunTime: singalRMachine.endRunTime,
+      startProcessTime: singalRMachine.startProcessTime,
+      endProcessTime: singalRMachine.endProcessTime,
+    });
+  };
+
   return (
     <div className={css('container')}>
       <div className={css('wrapper-above')}>
         <div className={css('select-machine')}>
-          <h1 className="font-bold text-[20px]">Lua chon may</h1>
+          <h1 className="font-bold text-[20px]">Lựa chọn máy</h1>
           <div className="select-area flex">
-            <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chon khu vuc</span>
+            <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn khu vực</span>
             <div className="w-[200px]">
               <Select
-                options={options}
+                value={currentArea}
+                onChange={getListMachineOfProject}
+                options={listArea?.map((option) => ({
+                  ...option,
+                  value: option.areaId,
+                  label: `${option.areaName}`,
+                }))}
                 isSearchable={false}
                 menuPlacement="auto"
-                maxMenu
-                Height={320} // Thiết lập chiều cao tối đa của menu
+                maxMenuHeight={250}
                 styles={{
                   control: (control, state) => ({
                     ...control,
-                    height: '18px',
                     border: 'none',
                     borderBottom: '1px solid #ccc',
                   }),
@@ -181,9 +175,10 @@ function Machine() {
             </div>
           </div>
           <div className="select-machine flex">
-            <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chon may</span>
+            <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn máy</span>
             <div className="w-[200px]">
               <Select
+                value={machineSelected}
                 onChange={handleChange}
                 options={options}
                 isSearchable={false}
@@ -204,9 +199,9 @@ function Machine() {
 
           <div
             onClick={displayMachineInfomation}
-            className="h-[36px] text-[18px] leading-[36px] text-center font-bold bg-[#99CFEB]"
+            className="h-[36px] text-[18px] cursor-pointer leading-[36px] text-center font-bold bg-[#99CFEB]"
           >
-            Hien thi du lieu
+            Hiển thị dữ liệu
           </div>
         </div>
         <div className={css('info-machine')}>
@@ -250,7 +245,7 @@ function Machine() {
       </div>
       <div className={css('wrapper-under')}>
         <div className={css('parameter-element')}>
-          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Availability-Do sang sang</h1>
+          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Availability-Độ sẵn sàng</h1>
           <div className={css('semi-chart')}>
             <h1>Availability</h1>
             <SemiCircleBar timeDivided={runTime} timeDivisor={workTime} />
@@ -258,7 +253,7 @@ function Machine() {
           </div>
         </div>
         <div className={css('parameter-element')}>
-          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Performance-Hieu suat</h1>
+          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Performance-Hiệu suất</h1>
           <div className={css('semi-chart')}>
             <h1>Performance</h1>
             <SemiCircleBar timeDivided={netRunTime} timeDivisor={runTime} />
@@ -266,7 +261,7 @@ function Machine() {
           </div>
         </div>
         <div className={css('parameter-element')}>
-          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Quality-Chat luong</h1>
+          <h1 className="mt-[6px] ml-2 text-[18px] font-bold">Quality-Chất lượng</h1>
           <div className={css('semi-chart')}>
             <h1>Quality</h1>
             <SemiCircleBar timeDivided={netRunTime} timeDivisor={netRunTime} />
@@ -283,3 +278,12 @@ function Machine() {
 }
 
 export default Machine;
+
+//
+// if (timeDiff < 4 * 60 * 60 * 1000) {
+//   setWorkTime(`${hours}:${minutes}:${seconds}`);
+// } else if (timeDiff < 6 * 60 * 60 * 1000) {
+//   setWorkTime(`04:00:00`);
+// } else {
+//   setWorkTime(`${hours - 2}:${minutes}:${seconds}`);
+// }

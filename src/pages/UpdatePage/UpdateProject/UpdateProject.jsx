@@ -1,6 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './UpdateProject.module.scss';
-import { addDetailToList } from '~/redux/projectSlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import hubConnection from '~/utils/hubConnection';
 import Alert from '~/components/Alert';
@@ -229,7 +228,6 @@ function UpdateProject() {
           </tbody>
         </table>
         <div className={css('button-update')}>
-          <button>Hủy</button>
           <button onClick={() => saveToDb()}>Lưu</button>
         </div>
       </div>

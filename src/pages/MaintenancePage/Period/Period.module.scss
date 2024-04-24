@@ -1,0 +1,15 @@
+.container {
+  height: 100%;
+  width: 100%;
+
+  .setting-maintenance {
+    margin: 16px auto 0 auto;
+    background-color: #fff;
+    height: 48%;
+    width: 440px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+  }
+}

@@ -78,8 +78,6 @@ function Project() {
             <th>Ngày ban hành</th>
             <th>Kỳ vọng</th>
             <th>Trạng thái</th>
-            <th>Thời gian gia công</th>
-            <th>Thời điểm nhập kho</th>
             <th>Ảnh chi tiết</th>
           </tr>
         </thead>
@@ -91,8 +89,6 @@ function Project() {
                 <td>{detail.startTime}</td>
                 <td>{detail.endTime}</td>
                 <td>{detail.detailStatus}</td>
-                <td>{detail.processTime}</td>
-                <td>Chưa nhập kho</td>
                 <td>Xem chi tiết</td>
               </tr>
             );

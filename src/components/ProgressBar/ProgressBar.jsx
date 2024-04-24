@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 // --------------------------------- END  LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 function ProgressBar({ className, timeDivided, timeDivisor }) {
-  let percent = 100;
+  const [isHidden, setIsHidden] = useState(false);
+  let percent = (timeDivided / timeDivisor) * 100;
   let color;
   // if (timeDivided && timeDivisor) {
   //   const eTimeDivided = timeDivided.split(':');
@@ -19,8 +20,8 @@ function ProgressBar({ className, timeDivided, timeDivisor }) {
   //   const tTimeDivisor = parseInt(eTimeDivisor[0]) * 3600 + parseInt(eTimeDivisor[1]) * 60 + parseInt(eTimeDivisor[2]);
   //   percent = ((tTimeDivided / tTimeDivisor) * 100).toFixed(2);
   // }
-  if (percent < 50) {
-    color = '#00aa11';
+  if (percent < 70) {
+    color = '#4bcc6f';
   } else if (70 <= percent && percent < 100) {
     color = '#FF9900';
   } else {
@@ -28,8 +29,9 @@ function ProgressBar({ className, timeDivided, timeDivisor }) {
   }
 
   return (
-    <div className="progress-bar w-[180px] h-[20px] bg-[#ccc]">
+    <div className={css('progress-bar')} onMouseEnter={() => setIsHidden(true)} onMouseLeave={() => setIsHidden(false)}>
       <div style={{ width: `${percent}%`, height: '20px', backgroundColor: `${color}` }}></div>
+      <div className={css('note', { displayNone: !isHidden })}>{`${timeDivided}h / ${timeDivisor}h`}</div>
     </div>
   );
 }

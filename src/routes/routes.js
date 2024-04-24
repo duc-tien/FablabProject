@@ -13,8 +13,8 @@ const privateRoutes = [
     { path: config.path.machine, page: config.page.machine, header:'GIÁM SÁT MÁY' },
     { path: config.path.update, page: config.page.update, header:'CẬP NHẬT DỮ LIỆU' },
     { path: config.path.history, page: config.page.history,header:'TRUY XUẤT DỮ LIỆU' },
-    { path: config.path.warehouse, page: config.page.warehouse,header:'XÁC NHẬN NHẬP KHO' },
-    { path: config.path.maintenance, page: config.page.maintenance,header:'THIẾT LẬP BẢO TRÌ' },
+    { path: config.path.warehouse, page: config.page.warehouse,header:'XÁC NHẬN CHI TIẾT' },
+    { path: config.path.maintenance, page: config.page.maintenance,header:'QUẢN LÝ BẢO TRÌ' },
 ];
 
 export { publicRoutes, privateRoutes };

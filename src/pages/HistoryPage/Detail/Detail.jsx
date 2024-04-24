@@ -2,10 +2,10 @@
 import style from './Detail.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
-import { getDetail, getMachine, getProject, getWorker } from '~/services/getServices';
 import Alert from '~/components/Alert';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import saveExcel from '~/utils/saveExcel';
+import calculateTime from '~/utils/calculateTime';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -63,8 +63,14 @@ function Detail() {
 
   const getInfoDetail = async (detail) => {
     const checkResult = checkInput();
-    const stageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
-    console.log(stageOfDetail);
+    const tempStageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
+    const stageOfDetail = tempStageOfDetail.map((e) => {
+      const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+      return {
+        ...e,
+        processTime: processTime,
+      };
+    });
     setStageDetail(stageOfDetail);
     if (checkResult) {
       setInfoDetail(() => {
@@ -208,44 +214,3 @@ function Detail() {
 }
 
 export default Detail;
-
-{
-  /* <select
-          className={css('select-input')}
-          value={currentProject}
-          onChange={(e) => getListDetailOfProject(e.target.value)}
-        >
-          <option hidden value="">
-            Select option...
-          </option>
-          {listProject?.map((project, index) => {
-            return (
-              <option key={index} value={project.projectId}>
-                {`${project.projectId}--${project.projectName}`}
-              </option>
-            );
-          })}
-        </select> */
-}
-
-{
-  /* <select
-          className={css('select-input')}
-          value={currentDetail}
-          onChange={(e) => setCurrentDetail(e.target.value)}
-        >
-          <option hidden value="">
-            Select option...
-          </option>
-          {listDetail?.map((detail, index) => {
-            return (
-              <option key={index} value={JSON.stringify(detail)}>{`${detail.detailId}--${detail.detailName}`}</option>
-            );
-          })}
-        </select> */
-}
-
-// const alterDetail = JSON.parse(currentDetail);
-// const [machine] = await getMachine(alterDetail.machineId);
-// const [worker] = await getWorker(alterDetail.workerId);
-// const [project] = await getProject(alterDetail.projectId);
