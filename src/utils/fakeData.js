@@ -222,15 +222,17 @@ export const listWorkerFake = [
     {
         workerId:2014718,
         workerName:'Nguyễn Văn A',
-        avatar:'https://smilemedia.vn/wp-content/uploads/2022/09/chup-hinh-the-dep-e1664379729855.jpg',
         workerLabel:'2014718-Nguyễn Văn A',
-        area:'Khu vực ra phôi'
+        area:'Khu vực ra phôi',
+        rfid:'abc125s4',
+        avatar:'https://smilemedia.vn/wp-content/uploads/2022/09/chup-hinh-the-dep-e1664379729855.jpg',
     },
     {
         workerId:2015483,
         workerName:'Nguyễn Văn B',
         workerLabel:'2015483-Nguyễn Văn B',
         area:'Khu vực khoan',
+        rfid:'abc125s4',
         avatar:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGLSmV0orv1Lom6_-7yX6Z-kpM3SVontyfvPTLgKlILg&s'
     },
     
@@ -239,6 +241,7 @@ export const listWorkerFake = [
         workerName:'Nguyễn Văn C',
         workerLabel:'2014525-Nguyễn Văn C',
         area:'Khu vực mài',
+        rfid:'abc125s4',
         avatar:'https://chuphinhthe.com/upload/product/5x5-8800.jpg'
     }
 ]

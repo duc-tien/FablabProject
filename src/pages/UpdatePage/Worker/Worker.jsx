@@ -3,20 +3,20 @@ import style from './Worker.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import instance from '~/utils/api';
-import Alert from '~/components/Alert';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 import { listWorkerFake } from '~/utils/fakeData';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function Worker() {
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
-  const [base64Image, setBase64Image] = useState('');
+  const [load, setLoad] = useState(false);
   const [listWorker, setListWorker] = useState([]);
   const [infoWorkerModify, setInfoWorkerModify] = useState();
   const [infoWorkerAdd, setInfoWorkerAdd] = useState({
@@ -26,15 +26,12 @@ function Worker() {
     avatar: '',
     rfid: '',
   });
+  useEffect(() => {
+    setListWorker(listWorkerFake);
+  }, []);
   const [isOpen, setISOpen] = useState(false);
   const [imgURL, setImgURL] = useState('');
 
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
 
@@ -43,18 +40,44 @@ function Worker() {
 
       reader.onloadend = () => {
         const base64Data = reader.result;
-        setBase64Image(base64Data);
+        setInfoWorkerAdd((prev) => {
+          return { ...prev, avatar: base64Data };
+        });
       };
 
       reader.readAsDataURL(file);
     }
   };
   const getListWorker = () => {
-    setListWorker(listWorkerFake);
+    // setListWorker(listWorkerFake);
   };
 
-  const handleChangeInfoWorker = () => {
-    console.log(infoWorkerModify);
+  const handleChangeInfoWorker = async () => {
+    if (infoWorkerModify) {
+      setLoad(true);
+      const res = await postProject({});
+      setLoad(false);
+      if (res) {
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
+      }
+    } else {
+      alert('Vui lòng chọn công nhân muốn thay đổi thông tin');
+    }
+  };
+  const handleDeleteWorker = () => {
+    const isConfirmed = confirm(`Bạn muốn xóa công nhân này?`);
+    console.log(isConfirmed);
+    if (isConfirmed) {
+      const newList = [...listWorker];
+      newList.shift();
+      setListWorker(newList);
+    }
   };
   const createInfoWorker = (key, data) => {
     setInfoWorkerAdd((prev) => {
@@ -64,8 +87,38 @@ function Worker() {
       };
     });
   };
-  const handleAddWorker = () => {
-    console.log(infoWorkerAdd);
+  const handleAddWorker = async () => {
+    let count = 0;
+    for (let value of Object.values(infoWorkerAdd)) {
+      if (!value) count++;
+    }
+    if (count != 0) {
+      alert('Vui lòng nhập đầy đủ thông tin');
+    } else {
+      setLoad(true);
+      const res = await postProject({});
+      setListWorker((prev) => {
+        return [...prev, infoWorkerAdd];
+      });
+      setLoad(false);
+      if (res) {
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
+      }
+    }
+  };
+
+  const deleteClientFromList = (index) => {
+    setListClient((prev) => {
+      let tempListClient = [...prev];
+      tempListClient.splice(index, 1);
+      return tempListClient;
+    });
   };
 
   return (
@@ -97,7 +150,7 @@ function Worker() {
           <div className={css('worker-field')}>Mã RFID:</div>
           <input
             value={infoWorkerAdd?.rfid}
-            onChange={(e) => createInfoWorker('area', e.target.value)}
+            onChange={(e) => createInfoWorker('rfid', e.target.value)}
             className={css('worker-info')}
             type="text"
           />
@@ -112,7 +165,7 @@ function Worker() {
             Tải ảnh
           </label>
           <input type="file" hidden id="avatar" onChange={handleFileInputChange} />
-          <img className={css('mini-img')} src={base64Image} />
+          <img className={css('mini-img')} src={infoWorkerAdd?.avatar} />
         </div>
         <div className={css('delete-worker')}>
           <span>Chỉnh sửa thông tin công nhân</span>
@@ -148,8 +201,15 @@ function Worker() {
           />
           <div className={css('worker-field')}>Mã RFID:</div>
           <input
-            value={infoWorkerAdd?.rfid}
-            onChange={(e) => createInfoWorker('area', e.target.value)}
+            value={infoWorkerModify?.rfid}
+            onChange={(e) => {
+              setInfoWorkerModify((prev) => {
+                return {
+                  ...prev,
+                  rfid: e.target.value,
+                };
+              });
+            }}
             className={css('worker-info')}
             type="text"
           />
@@ -169,16 +229,18 @@ function Worker() {
             <th>Mã định danh</th>
             <th>Họ và tên</th>
             <th>Khu vực</th>
+            <th>Mã RFID</th>
             <th>Ảnh công nhân</th>
           </tr>
         </thead>
         <tbody>
           {listWorker?.map((worker, index) => {
             return (
-              <tr>
+              <tr key={index}>
                 <td>{worker.workerId}</td>
                 <td>{worker.workerName}</td>
                 <td>{worker.area}</td>
+                <td>{worker.rfid}</td>
                 <td
                   className={css('view-avatar')}
                   onClick={() => {
@@ -192,6 +254,11 @@ function Worker() {
                   <FontAwesomeIcon
                     onClick={() => setInfoWorkerModify(worker)}
                     icon={faPen}
+                    className={css('icon-pen')}
+                  />
+                  <FontAwesomeIcon
+                    onClick={() => handleDeleteWorker(worker)}
+                    icon={faTrash}
                     className={css('icon-pen')}
                   />
                 </td>
@@ -210,7 +277,7 @@ function Worker() {
           <img src={imgURL} alt="" />
         </div>
       )}
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
+      {load && <Loading />}
     </div>
   );
 }

@@ -8,10 +8,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function RecordError() {
+  const [load, setLoad] = useState(false);
   const [listArea, setListArea] = useState([]);
   const [listMachine, setListMachine] = useState([]);
   const [currentMachine, setCurrentMachine] = useState('');
@@ -33,23 +36,65 @@ function RecordError() {
   const handleChange = (selectedOption) => {
     setCurrentMachine(selectedOption);
   };
+
+  const checkInput = () => {
+    if (!currentArea) {
+      alert('Vui lòng chọn Khu vực ');
+      return false;
+    }
+
+    if (!currentMachine) {
+      alert('Vui lòng chọn máy');
+      return false;
+    }
+    if (!dateError) {
+      alert('Vui lòng chọn ngày ghi lỗi');
+      return false;
+    }
+    if (!errorNote) {
+      alert('Vui lòng chọn ngày ghi lỗi');
+      return false;
+    }
+    return true;
+  };
   const addError = () => {
-    setListError((prev) => {
-      return [
-        ...prev,
-        {
-          machineName: currentMachine.label,
-          error: errorNote,
-          date: dateError,
-        },
-      ];
-    });
+    const checkResult = checkInput();
+    if (checkResult) {
+      setListError((prev) => {
+        return [
+          ...prev,
+          {
+            machineName: currentMachine.label,
+            error: errorNote,
+            date: dateError,
+          },
+        ];
+      });
+    }
   };
 
   const removeError = (index) => {
     const tempList = [...listError];
     tempList.splice(index, 1);
     setListError(tempList);
+  };
+  const handleSubmit = async () => {
+    if (listError.length > 0) {
+      setLoad(true);
+      const res = await postProject({});
+      setLoad(false);
+      if (res) {
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
+      }
+    } else {
+      alert('Vui lòng thực hiện việc ghi lỗi trước');
+    }
   };
 
   return (
@@ -160,8 +205,9 @@ function RecordError() {
         </tbody>
       </table>
       <div className={css('button-update')}>
-        <button>Lưu</button>
+        <button onClick={handleSubmit}>Lưu</button>
       </div>
+      {load && <Loading />}
     </div>
   );
 }

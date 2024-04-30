@@ -1,181 +1,140 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Warehouse.module.scss';
-import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
-
-import Alert from '~/components/Alert';
+import { listAreaFake, listMachineFake } from '~/utils/fakeData';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { list } from 'postcss';
 import Select from 'react-select';
-
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function Warehouse() {
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
-  const [listProject, setListProject] = useState([]);
-  const [listDetail, setListDetail] = useState([]);
-  const [currentDetail, setCurrentDetail] = useState('');
-  const [currentProject, setCurrentProject] = useState('');
+  const [load, setLoad] = useState(false);
+  const [listArea, setListArea] = useState([]);
+  const [listMachine, setListMachine] = useState([]);
+  const [currentMachine, setCurrentMachine] = useState('');
+  const [currentArea, setCurrentArea] = useState('');
+  const [listError, setListError] = useState([]);
+  const [errorNote, setErrorNote] = useState([]);
+  const [dateError, setDateError] = useState('');
   useEffect(() => {
-    setListProject(listProjectFake);
+    setListArea(listAreaFake);
   }, []);
 
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
-  const getListDetailOfProject = async (selectedOption) => {
-    setCurrentProject(selectedOption);
-    const tempListDetail = listDetailFake.filter((x) => x.projectId == selectedOption.projectId);
-    setListDetail(tempListDetail);
-    setCurrentDetail('');
-  };
-
-  const checkInput = () => {
-    if (!currentProject) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn dự án muốn tra cứu',
-      });
-      return false;
-    }
-
-    if (!currentDetail) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn chi tiết muốn tra cứu',
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const getInfoDetail = async (detail) => {
-    const checkResult = checkInput();
-    const stageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
-    console.log(stageOfDetail);
-    setStageDetail(stageOfDetail);
-    if (checkResult) {
-      setInfoDetail(() => {
-        return {
-          ...detail,
-          projectName: currentProject.projectName,
-        };
-      });
-    }
+  const getListMachineOfProject = async (selectedOption) => {
+    setCurrentArea(selectedOption);
+    const templistMachine = listMachineFake.filter((x) => x.areaId == selectedOption.areaId);
+    setListMachine(templistMachine);
+    setCurrentMachine('');
   };
 
   const handleChange = (selectedOption) => {
-    setCurrentDetail(selectedOption);
+    setCurrentMachine(selectedOption);
+  };
+
+  const checkInput = () => {
+    if (!currentArea) {
+      alert('Vui lòng chọn Khu vực ');
+      return false;
+    }
+
+    if (!currentMachine) {
+      alert('Vui lòng chọn máy');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    const checkResult = checkInput();
+    if (checkResult) {
+      setLoad(true);
+      const res = await postProject({});
+      setLoad(false);
+      if (res) {
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
+      }
+    } else {
+      alert('Vui lòng thực hiện việc ghi lỗi trước');
+    }
   };
 
   return (
     <div className={css('container')}>
-      <div className={css('select-area')}>
-        <div className={css('select-title')}>Chọn dự án:</div>
-
-        <div style={{ width: '280px' }}>
-          <Select
-            value={currentProject}
-            onChange={getListDetailOfProject}
-            options={listProject?.map((option) => ({
-              ...option,
-              value: option.projectId,
-              label: `${option.projectId}---${option.projectName}`,
-            }))}
-            isSearchable={false}
-            menuPlacement="auto"
-            maxMenuHeight={250}
-            styles={{
-              control: (control, state) => ({
-                ...control,
-                border: 'none',
-                borderBottom: '1px solid #ccc',
-              }),
-            }}
-          />
+      <div className={css('record-error')}>
+        <h1 className="font-bold text-[20px]">Xác nhận chi tiết hoàn thành</h1>
+        <div className="select-area flex">
+          <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn dự án</span>
+          <div className="w-[360px]">
+            <Select
+              value={currentArea}
+              onChange={getListMachineOfProject}
+              options={listArea?.map((option) => ({
+                ...option,
+                value: option.areaId,
+                label: `${option.areaName}`,
+              }))}
+              isSearchable={false}
+              menuPlacement="auto"
+              maxMenuHeight={250}
+              styles={{
+                control: (control, state) => ({
+                  ...control,
+                  border: 'none',
+                  borderBottom: '1px solid #ccc',
+                }),
+              }}
+            />
+          </div>
+        </div>
+        <div className="select-machine flex">
+          <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn chi tiết</span>
+          <div className="w-[360px]">
+            <Select
+              value={currentMachine}
+              onChange={handleChange}
+              options={listMachine?.map((option) => ({
+                ...option,
+                value: option.machineId,
+                label: ` ${option.machineName}`,
+              }))}
+              isSearchable={false}
+              menuPlacement="auto"
+              maxMenuHeight={250}
+              styles={{
+                control: (control, state) => ({
+                  ...control,
+                  border: 'none',
+                  borderBottom: '1px solid #ccc',
+                }),
+              }}
+            />
+          </div>
         </div>
 
-        <div className={css('select-title')}>Chọn chi tiết:</div>
-
-        <div style={{ width: '280px' }}>
-          <Select
-            value={currentDetail}
-            onChange={handleChange}
-            options={listDetail?.map((option) => ({
-              ...option,
-              value: option.detailId,
-              label: `${option.detailId}---${option.detailName}`,
-            }))}
-            isSearchable={false}
-            menuPlacement="auto"
-            maxMenuHeight={250}
-            styles={{
-              control: (control, state) => ({
-                ...control,
-                border: 'none',
-                borderBottom: '1px solid #ccc',
-              }),
-            }}
-          />
+        <div
+          onClick={() => handleSubmit()}
+          className="h-[36px] text-[18px] leading-[36px] text-center font-bold bg-[#99CFEB] cursor-pointer mt-[16px]  "
+        >
+          Xác nhận hoàn thành
         </div>
-
-        <button onClick={() => getInfoDetail(currentDetail)}>Xác nhận hoàn thành</button>
       </div>
 
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
+      {load && <Loading />}
     </div>
   );
 }
 
 export default Warehouse;
-
-{
-  /* <select
-          className={css('select-input')}
-          value={currentProject}
-          onChange={(e) => getListDetailOfProject(e.target.value)}
-        >
-          <option hidden value="">
-            Select option...
-          </option>
-          {listProject?.map((project, index) => {
-            return (
-              <option key={index} value={project.projectId}>
-                {`${project.projectId}--${project.projectName}`}
-              </option>
-            );
-          })}
-        </select> */
-}
-
-{
-  /* <select
-          className={css('select-input')}
-          value={currentDetail}
-          onChange={(e) => setCurrentDetail(e.target.value)}
-        >
-          <option hidden value="">
-            Select option...
-          </option>
-          {listDetail?.map((detail, index) => {
-            return (
-              <option key={index} value={JSON.stringify(detail)}>{`${detail.detailId}--${detail.detailName}`}</option>
-            );
-          })}
-        </select> */
-}
-
-// const alterDetail = JSON.parse(currentDetail);
-// const [machine] = await getMachine(alterDetail.machineId);
-// const [worker] = await getWorker(alterDetail.workerId);
-// const [project] = await getProject(alterDetail.projectId);
-
-// setCurrentProject(prjId);
-// const res = await getDetail({ prjId });
-// setListDetail(res);

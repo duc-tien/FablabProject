@@ -24,17 +24,7 @@ export const deleteMachine=async(macihneId)=>{
     }
 }
 
-export const deleteOrder=async(orderId)=>{
-    try {
-        await instance.delete('/Order',{
-            params:{
-                orderId
-            }
-        })
-    } catch (error) {
-        console.log(error);
-    }
-}
+ 
 
 export const deleteProject=async(prjId)=>{
     try {

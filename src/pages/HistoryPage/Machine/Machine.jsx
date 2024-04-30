@@ -1,23 +1,24 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Machine.module.scss';
-import { addHobby, deleteHobby } from '~/redux/hobbySlice';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getMachine, getDetail, getWorker } from '~/services/getServices';
-import Alert from '~/components/Alert';
 import { listDetailFake, listMachineFake, listProjectFake, stage, oeeFake } from '~/utils/fakeData';
 import Recharts from '~/components/Recharts';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import moment from 'moment';
+
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function Machine() {
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
+  const [load, setLoad] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [listMCInit, setListMCInit] = useState([]);
@@ -45,37 +46,32 @@ function Machine() {
   useEffect(() => {
     setListMCInit(listMachineFake);
     setDataoee(oeeFake);
+    const today = moment().format('YYYY-MM-DD');
+    const sevenDaysAgo = moment().subtract(7, 'days').format('YYYY-MM-DD');
+
+    setStartDate(sevenDaysAgo);
+    setEndDate(today);
   }, []);
 
   const checkInput = () => {
-    if (!startDate && !endDate) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn thời gian muốn tra cứu',
-      });
+    if (!currentMachine) {
+      alert('Vui lòng chọn máy muốn tra cứu');
       return false;
     }
-    if (!currentMachine) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn máy muốn tra cứu',
-      });
+    if (!curInfo) {
+      alert('Vui lòng chọn thông tin muốn tra cứu');
       return false;
     }
     return true;
   };
 
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
-
   const getHistoryOfMachine = async (machine, info) => {
-    // const resultCheck = checkInput();
+    const resultCheck = checkInput();
 
-    if (true) {
+    if (resultCheck) {
+      setLoad(true);
+      await postProject({});
+
       setCurrentMachineInfo(machine);
       setView(info.value);
       const tempHistory = stage.filter((x) => x.machineId == machine.machineId);
@@ -88,10 +84,10 @@ function Machine() {
       });
       setHistoryOfMachine(history);
 
+      setLoad(false);
       //   if (startDate && endDate) {
       //     setHistoryOfMachine((prev) => {
       //       const filter = history.filter((e) => {
-      //         const compareTime = new Date(e.startProcessTime);
       //         const dateBefore = new Date(startDate);
       //         dateBefore.setHours(7, 0, 0);
       //         const dateAfter = new Date(endDate);
@@ -272,7 +268,7 @@ function Machine() {
           </table>
         </div>
       )}
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
+      {load && <Loading />}
     </div>
   );
 }

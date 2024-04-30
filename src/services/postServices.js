@@ -1,9 +1,9 @@
 import instance from "~/utils/api"
 
-export const postWoker=async (wokerId,wokerName,position,fileData)=>{
+export const postWoker=async (wokerId,wokerName,noteArea,rfid,fileData)=>{
     try {
     const res = await instance.post('/Woker',{
-        wokerId,wokerName,position,fileData
+        wokerId,wokerName,noteArea,rfid,fileData
     })
     return res.data
     } 
@@ -12,10 +12,10 @@ export const postWoker=async (wokerId,wokerName,position,fileData)=>{
     }
 }
 
-export const postMachine=async (macihneId,macihneName,description)=>{
+export const postMachineError=async (errorName,errorDescription,errorTime,machineId)=>{
     try {
-    const res = await instance.post('/Machine',{
-        macihneId,macihneName,description
+    const res = await instance.post('/Machine/Error',{
+        errorName,errorDescription,errorTime,machineId
     })
     return res.data
     } 
@@ -24,29 +24,6 @@ export const postMachine=async (macihneId,macihneName,description)=>{
     }
 }
 
-export const postOrder=async (orderId,custummer,phoneNumber,address,email,product,note,startDate,endDate)=>{
-    try {
-    const res = await instance.post('/Order',{
-        orderId,custummer,phoneNumber,address,email,product,note,startDate,endDate
-    })
-    return res.data
-    } 
-    catch (error) {
-    console.log(error);
-    }
-}
-
-// export const postProject=async (projectId,projectName,startDate,endDate,note,orderId)=>{
-//     try {
-//     const res = await instance.post('/Project',{
-//         projectId,projectName,startDate,endDate,note,orderId
-//     })
-//     return res.data
-//     } 
-//     catch (error) {
-//     console.log(error);
-//     }
-// }
 
 export const postProject=async (project)=>{
     try {

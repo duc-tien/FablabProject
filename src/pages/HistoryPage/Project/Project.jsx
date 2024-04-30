@@ -1,12 +1,10 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Project.module.scss';
-import { addHobby, deleteHobby } from '~/redux/hobbySlice';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getDetail, getMachine, getProject, getWorker } from '~/services/getServices';
-import Alert from '~/components/Alert';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import Loading from '~/components/Loading';
 import saveExcel from '~/utils/saveExcel';
+import { postProject } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -18,6 +16,7 @@ import Select from 'react-select';
 const css = classNames.bind(style);
 
 function Project() {
+  const [load, setLoad] = useState(false);
   const [imgURL, setImgURL] = useState('');
   const [isOpen, setISOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,14 +29,28 @@ function Project() {
   }, []);
 
   const getDetailOfProject = async (project) => {
-    const tempListDetail = listDetailFake.filter((x) => x.projectId == project.projectId);
-    setListDetailFilter(tempListDetail);
-    setCurrentProjectInfo(project);
+    const checkResult = checkInput();
+    if (checkResult) {
+      setLoad(true);
+      await postProject({});
+      const tempListDetail = listDetailFake.filter((x) => x.projectId == project.projectId);
+      setListDetailFilter(tempListDetail);
+      setCurrentProjectInfo(project);
+      setLoad(false);
+    }
   };
   const handleChange = (selectedOption) => {
     setCurrentProject(selectedOption);
   };
 
+  const checkInput = () => {
+    if (!currentProject) {
+      alert('Vui lòng chọn dự án muốn tra cứu');
+
+      return false;
+    }
+    return true;
+  };
   const saveFileExcel = () => {};
   return (
     <div className={css('container')}>
@@ -105,7 +118,7 @@ function Project() {
           <img src={imgURL} alt="" />
         </div>
       )}
-      {isLoading && <Loading />}
+      {load && <Loading />}
     </div>
   );
 }

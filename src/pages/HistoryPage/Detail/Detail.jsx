@@ -2,10 +2,11 @@
 import style from './Detail.module.scss';
 import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
-import Alert from '~/components/Alert';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -17,8 +18,7 @@ import Select from 'react-select';
 const css = classNames.bind(style);
 
 function Detail() {
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
-
+  const [load, setLoad] = useState(false);
   const [listProject, setListProject] = useState([]);
   const [listDetail, setListDetail] = useState([]);
   const [currentDetail, setCurrentDetail] = useState('');
@@ -29,12 +29,6 @@ function Detail() {
     setListProject(listProjectFake);
   }, []);
 
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
   const getListDetailOfProject = async (selectedOption) => {
     setCurrentProject(selectedOption);
     const tempListDetail = listDetailFake.filter((x) => x.projectId == selectedOption.projectId);
@@ -44,18 +38,12 @@ function Detail() {
 
   const checkInput = () => {
     if (!currentProject) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn dự án muốn tra cứu',
-      });
+      alert('Vui lòng chọn dự án ');
       return false;
     }
 
     if (!currentDetail) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn chi tiết muốn tra cứu',
-      });
+      alert('Vui lòng chọn chi tiết muốn tra cứu');
       return false;
     }
     return true;
@@ -63,22 +51,25 @@ function Detail() {
 
   const getInfoDetail = async (detail) => {
     const checkResult = checkInput();
-    const tempStageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
-    const stageOfDetail = tempStageOfDetail.map((e) => {
-      const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
-      return {
-        ...e,
-        processTime: processTime,
-      };
-    });
-    setStageDetail(stageOfDetail);
     if (checkResult) {
+      setLoad(true);
+      await postProject({});
+      const tempStageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
+      const stageOfDetail = tempStageOfDetail.map((e) => {
+        const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+        return {
+          ...e,
+          processTime: processTime,
+        };
+      });
+      setStageDetail(stageOfDetail);
       setInfoDetail(() => {
         return {
           ...detail,
           projectName: currentProject.projectName,
         };
       });
+      setLoad(false);
     }
   };
 
@@ -208,7 +199,7 @@ function Detail() {
           })}
         </tbody>
       </table>
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
+      {load && <Loading />}
     </div>
   );
 }

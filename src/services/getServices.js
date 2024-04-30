@@ -16,12 +16,37 @@ export const getWorker = async( workerId=null,pageSize=10,pageNumber=1)=>{
   
 
 }
+export const getWorkerLog = async( workerId,start=null,end=null)=>{
+    try {
+          const res = await instance.get('/Worker',{
+        params:{
+            workerId,
+            start,
+            end
+        }
+    })
+    return res.data
+    } catch (error) {
+        console.log(error);
+    }
+  
 
-export const getMachine = async(machineId=null)=>{
+}
+
+export const getArea = async()=>{
+    try {
+        const res = await instance.get('/Machine/Area')
+        return res.data
+    } catch (error) {
+        
+    }
+}
+
+export const getMachine = async(areaId)=>{
     try {
         const res = await instance.get('/Machine',{
             params:{
-                machineId
+                areaId
             }
         })
         return res.data
@@ -30,40 +55,69 @@ export const getMachine = async(machineId=null)=>{
     }
 }
 
-export const getOEE=async(machineId,startDate,endDate)=>{
+export const getMachineDetailLog = async(machineId,start=null,end=null)=>{
+    try {
+        const res = await instance.get('/Machine/DetailLog',{
+            params:{
+                machineId,
+                start,
+                end
+            }
+        })
+        return res.data
+    } catch (error) {
+        
+    }
+}
+export const getMachineELog = async(machineId,start=null,end=null)=>{
+    try {
+        const res = await instance.get('/Machine/ELog',{
+            params:{
+                machineId,
+                start,
+                end
+            }
+        })
+        return res.data
+    } catch (error) {
+        
+    }
+}
+export const getMachineError = async(machineId,start=null,end=null)=>{
+    try {
+        const res = await instance.get('/Machine/Error',{
+            params:{
+                machineId,
+                start,
+                end
+            }
+        })
+        return res.data
+    } catch (error) {
+        
+    }
+}
+export const getMachineOEE = async(machineId,start=null,end=null)=>{
     try {
         const res = await instance.get('/Machine/OEE',{
             params:{
                 machineId,
-                startDate,
-                endDate
+                start,
+                end
             }
         })
         return res.data
     } catch (error) {
-        console.log(error);
+        
     }
 }
 
-export const getOrder=async(search)=>{
-    try {
-        const res = await instance.get('/Order',{
-            params:{
-                search
-            }
-        })
-        return res.data
-    } catch (error) {
-        console.log(error);
-    }
-}
 
-export const getProject=async(prjId=null,orderId=null)=>{
+export const getProject=async(prjId=null )=>{
     try {
         const res = await instance.get('/Project',{
             params:{
-                orderId:orderId,
-                prjId:prjId
+                prjId
             }
         })
         return res.data
@@ -71,11 +125,27 @@ export const getProject=async(prjId=null,orderId=null)=>{
         console.log(error);
     }
 }
-export const getDetail=async({prjId,detailId,workerId,machineId,status,pageSize=20,pageNumber=1})=>{
+export const getListDetail=async(projectId,status=null,pageSize=100,pageNumber=1 )=>{
     try {
         const res = await instance.get('/Detail',{
             params:{
-                prjId,detailId,workerId,machineId,status,pageSize,pageNumber
+                projectId,
+                status,
+                pageSize,
+                pageNumber
+            }
+        })
+        return res.data
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const getDetailLog=async(detailId )=>{
+    try {
+        const res = await instance.get('/Detail/full',{
+            params:{
+                detailId
             }
         })
         return res.data

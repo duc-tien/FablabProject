@@ -119,30 +119,45 @@ function Machine() {
     setMachineSelected(selectedOption);
   };
 
+  const checkInput = () => {
+    if (!currentArea) {
+      alert('Vui lòng chọn khu vực ');
+      return false;
+    }
+
+    if (!machineSelected) {
+      alert('Vui lòng chọn máy');
+      return false;
+    }
+    return true;
+  };
   const displayMachineInfomation = async () => {
-    setMachineImage(machineSelected?.image);
-    setCurrentMachineId(machineSelected?.value);
-    const tempList = stage.filter((x) => x.machineId == machineSelected.value);
-    const list = tempList.map((e) => {
-      return {
-        startTimeStamp: e.startProcessTime,
-        endTimeStamp: e.endProcessTime,
-      };
-    });
-    const accumulateTime = calculateSumTime(list);
-    setStoreTime(accumulateTime);
+    const checkResult = checkInput();
+    if (checkResult) {
+      setMachineImage(machineSelected?.image);
+      setCurrentMachineId(machineSelected?.value);
+      const tempList = stage.filter((x) => x.machineId == machineSelected.value);
+      const list = tempList.map((e) => {
+        return {
+          startTimeStamp: e.startProcessTime,
+          endTimeStamp: e.endProcessTime,
+        };
+      });
+      const accumulateTime = calculateSumTime(list);
+      setStoreTime(accumulateTime);
 
-    const { data } = await axios.get('https://localhost:7245/Message');
-    const singalRMachine = data.find((e) => {
-      return e.machine == machineSelected.value;
-    });
+      const { data } = await axios.get('https://localhost:7245/Message');
+      const singalRMachine = data.find((e) => {
+        return e.machine == machineSelected.value;
+      });
 
-    setTimeStamp({
-      startRunTime: singalRMachine.startRunTime,
-      endRunTime: singalRMachine.endRunTime,
-      startProcessTime: singalRMachine.startProcessTime,
-      endProcessTime: singalRMachine.endProcessTime,
-    });
+      setTimeStamp({
+        startRunTime: singalRMachine.startRunTime,
+        endRunTime: singalRMachine.endRunTime,
+        startProcessTime: singalRMachine.startProcessTime,
+        endProcessTime: singalRMachine.endProcessTime,
+      });
+    }
   };
 
   return (

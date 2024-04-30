@@ -1,63 +1,54 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Employee.module.scss';
-import { addHobby, deleteHobby } from '~/redux/hobbySlice';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { getWorker, getDetail, getMachine } from '~/services/getServices';
-import Alert from '~/components/Alert';
 import { listWorkerFake, stage } from '~/utils/fakeData';
 import noUser from '~/assets/imgs/noUser.jpg';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
+import Loading from '~/components/Loading';
+import { postProject } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
+import moment from 'moment';
+import { faL } from '@fortawesome/free-solid-svg-icons';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
 function Employee() {
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
+  const [load, setLoad] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [listWorkerInit, setListWorkerInit] = useState([]);
   const [currentWorker, setCurrentWorker] = useState('');
   const [currentWorkerInfo, setCurrentWorkerInfo] = useState({});
   const [historyOfWorker, setHistoryOfWorker] = useState([]);
-  const url = '';
 
   useEffect(() => {
     setListWorkerInit(listWorkerFake);
+    const today = moment().format('YYYY-MM-DD');
+    const sevenDaysAgo = moment().subtract(7, 'days').format('YYYY-MM-DD');
+
+    setStartDate(sevenDaysAgo);
+    setEndDate(today);
   }, []);
 
   const checkInput = () => {
-    if (!startDate && !endDate) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn thời gian muốn tra cứu',
-      });
-      return false;
-    }
     if (!currentWorker) {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng chọn nhân viên muốn tra cứu',
-      });
+      alert('Vui lòng chọn nhân viên muốn tra cứu');
 
       return false;
     }
     return true;
   };
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
 
   const getHistoryOfWorker = async (worker) => {
-    // const checkResult = checkInput();
-    if (true) {
+    const checkResult = checkInput();
+    if (checkResult) {
+      setLoad(true);
+      await postProject({});
       setCurrentWorkerInfo(worker);
       const tempHistory = stage.filter((x) => x.workerId == worker.workerId);
       const history = tempHistory.map((e) => {
@@ -68,7 +59,7 @@ function Employee() {
         };
       });
       setHistoryOfWorker(history);
-
+      setLoad(false);
       // if (startDate && endDate) {
       //   setHistoryOfWorker((prev) => {
       //     const filter = alterHistory.filter((e) => {
@@ -207,7 +198,7 @@ function Employee() {
           })}
         </tbody>
       </table>
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
+      {load && <Loading />}
     </div>
   );
 }

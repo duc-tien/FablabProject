@@ -1,8 +1,6 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './UpdateProject.module.scss';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import hubConnection from '~/utils/hubConnection';
-import Alert from '~/components/Alert';
 import Loading from '~/components/Loading';
 import { postProject } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
@@ -17,20 +15,7 @@ const css = classNames.bind(style);
 function UpdateProject() {
   // useEffect(() => {
   //   hubConnection.start();
-  //   hubConnection.connection.send('SendAllTag');
-  //   hubConnection.connection.on('GetAll', (msg) => {
-  //     console.log('alltag object:', JSON.parse(msg));
-  //   });
-
-  //   hubConnection.connection.on('TagChanged', (msg) => {
-  //     console.log('Tagchange object:', JSON.parse(msg));
-  //   });
-  //   return () => {
-  //     hubConnection.connection.off('TagChanged');
-  //     hubConnection.connection.off('GetAll');
-  //   };
   // }, [hubConnection.connection]);
-  const [alert, setAlert] = useState({ isAlert: false, content: '' });
   const [load, setLoad] = useState(false);
   const [dataExcel, setDataExcel] = useState([]);
   const [imgURL, setImgURL] = useState('');
@@ -45,13 +30,6 @@ function UpdateProject() {
     'Ảnh chi tiết',
     'Công đoạn',
   ];
-
-  const cancelAlert = () => {
-    setAlert({
-      isAlert: false,
-      content: '',
-    });
-  };
 
   const modifyKeyObject = (data) => {
     const modifyData = data.map((e) => {
@@ -100,18 +78,12 @@ function UpdateProject() {
         if (count == excelCol.length) {
           setDataExcel(newParseData);
         } else {
-          setAlert({
-            isAlert: true,
-            content: 'Các trường dữ liệu không đúng định dạng, vui lòng kiểm tra lại',
-          });
+          alert('Các trường dữ liệu không đúng định dạng, vui lòng kiểm tra lại');
           setDataExcel([]);
         }
       };
     } else {
-      setAlert({
-        isAlert: true,
-        content: 'File phải có dạng .xlsx hoặc .csv, vui lòng kiểm tra lại',
-      });
+      alert('File phải có dạng .xlsx hoặc .csv, vui lòng kiểm tra lại');
     }
   };
   const fetchImage = async (imageURL) => {
@@ -162,21 +134,16 @@ function UpdateProject() {
       const res = await postProject(tempProject);
       setLoad(false);
       if (res == tempProject.projectId) {
-        setAlert({
-          isAlert: true,
-          content: 'Cập nhật thành công',
-        });
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
       } else {
-        setAlert({
-          isAlert: true,
-          content: 'Cập nhật không thành công',
-        });
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
       }
     } else {
-      setAlert({
-        isAlert: true,
-        content: 'Vui lòng nhập dữ liệu',
-      });
+      alert('Vui lòng nhập dữ liệu');
     }
   };
 
@@ -241,7 +208,6 @@ function UpdateProject() {
           <img src={imgURL} alt="" />
         </div>
       )}
-      {alert.isAlert && <Alert content={alert.content} onClose={cancelAlert} />}
       {load && <Loading />}
     </div>
   );
