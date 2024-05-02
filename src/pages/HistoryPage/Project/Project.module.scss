@@ -59,6 +59,28 @@
     th {
       border: 1px solid #ddd;
       padding: 4px;
+      &:nth-child(1) {
+        width: 200px;
+      }
+      &:nth-child(2) {
+        width: 240px;
+      }
+      &:nth-child(3) {
+        width: 240px;
+      }
+      &:nth-child(4) {
+        width: 350px;
+      }
+      &:nth-child(5) {
+        width: 210px;
+      }
+    }
+
+    td {
+      &:nth-child(5) {
+        cursor: pointer;
+        font-weight: bold;
+      }
     }
   }
 
@@ -97,6 +119,20 @@
       line-height: 32px;
       color: #fff;
       background-color: #009c4e;
+    }
+  }
+  .lightbox {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(150, 150, 150, 0.5);
+    display: flex;
+    img {
+      height: 80%;
+      margin: auto;
     }
   }
 }

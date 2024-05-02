@@ -30,12 +30,26 @@
           background-color: #ddd;
         }
       }
+      .icon-trash {
+        cursor: pointer;
+        margin-right: 8px;
+        color: red;
+      }
     }
 
     td,
     th {
       border: 1px solid #ddd;
       padding: 4px;
+      &:nth-child(1) {
+        width: 395px;
+      }
+      &:nth-child(2) {
+        width: 395px;
+      }
+      &:nth-child(3) {
+        width: 395px;
+      }
     }
   }
   .button-update {

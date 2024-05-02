@@ -4,8 +4,12 @@ import { addHobby, deleteHobby } from '~/redux/hobbySlice';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import instance from '~/utils/api';
 import Loading from '~/components/Loading';
-import { postProject } from '~/services/postServices';
+import { postProject, postWoker } from '~/services/postServices';
+import { getWorker } from '~/services/getServices';
+import { putWorker } from '~/services/putServices';
 import { listWorkerFake } from '~/utils/fakeData';
+import { deleteWoker } from '~/services/deleteServices';
+
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -17,18 +21,16 @@ const css = classNames.bind(style);
 
 function Worker() {
   const [load, setLoad] = useState(false);
+  const [idWorkerDelete, setIdWorkerDelete] = useState();
   const [listWorker, setListWorker] = useState([]);
   const [infoWorkerModify, setInfoWorkerModify] = useState();
   const [infoWorkerAdd, setInfoWorkerAdd] = useState({
     workerId: '',
     workerName: '',
-    area: '',
-    avatar: '',
+    noteArea: '',
+    fileData: '',
     rfid: '',
   });
-  useEffect(() => {
-    setListWorker(listWorkerFake);
-  }, []);
   const [isOpen, setISOpen] = useState(false);
   const [imgURL, setImgURL] = useState('');
 
@@ -40,24 +42,34 @@ function Worker() {
 
       reader.onloadend = () => {
         const base64Data = reader.result;
+        const index = base64Data.indexOf(',');
+        const newbase64 = base64Data.substring(index + 1);
         setInfoWorkerAdd((prev) => {
-          return { ...prev, avatar: base64Data };
+          return { ...prev, fileData: newbase64 };
         });
       };
 
       reader.readAsDataURL(file);
     }
   };
-  const getListWorker = () => {
+  const getListWorker = async () => {
+    const res = await getWorker();
+    setListWorker(res);
     // setListWorker(listWorkerFake);
   };
 
   const handleChangeInfoWorker = async () => {
     if (infoWorkerModify) {
       setLoad(true);
-      const res = await postProject({});
+      const dataPut = {
+        workerId: infoWorkerModify.workerId,
+        workerName: infoWorkerModify.workerName,
+        noteArea: infoWorkerModify.noteArea,
+        rfid: infoWorkerModify.rfid,
+      };
+      const res = await putWorker(dataPut);
       setLoad(false);
-      if (res) {
+      if (res == infoWorkerModify.workerId) {
         setTimeout(() => {
           alert('Cập nhật thành công');
         }, 50);
@@ -70,13 +82,23 @@ function Worker() {
       alert('Vui lòng chọn công nhân muốn thay đổi thông tin');
     }
   };
-  const handleDeleteWorker = () => {
+  const handleDeleteWorker = async (workerId) => {
+    setIdWorkerDelete(workerId);
     const isConfirmed = confirm(`Bạn muốn xóa công nhân này?`);
-    console.log(isConfirmed);
     if (isConfirmed) {
-      const newList = [...listWorker];
-      newList.shift();
-      setListWorker(newList);
+      setLoad(true);
+      const res = await deleteWoker(workerId);
+      setLoad(false);
+      console.log(res);
+      if (res == idWorkerDelete) {
+        setTimeout(() => {
+          alert('Đã xóa thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Thực hiện xóa không thành công');
+        }, 50);
+      }
     }
   };
   const createInfoWorker = (key, data) => {
@@ -96,12 +118,9 @@ function Worker() {
       alert('Vui lòng nhập đầy đủ thông tin');
     } else {
       setLoad(true);
-      const res = await postProject({});
-      setListWorker((prev) => {
-        return [...prev, infoWorkerAdd];
-      });
+      const res = await postWoker(infoWorkerAdd);
       setLoad(false);
-      if (res) {
+      if (res == infoWorkerAdd.workerId) {
         setTimeout(() => {
           alert('Cập nhật thành công');
         }, 50);
@@ -142,8 +161,8 @@ function Worker() {
           />
           <div className={css('worker-field')}>Khu vực:</div>
           <input
-            value={infoWorkerAdd?.area}
-            onChange={(e) => createInfoWorker('area', e.target.value)}
+            value={infoWorkerAdd?.noteArea}
+            onChange={(e) => createInfoWorker('noteArea', e.target.value)}
             className={css('worker-info')}
             type="text"
           />
@@ -165,7 +184,7 @@ function Worker() {
             Tải ảnh
           </label>
           <input type="file" hidden id="avatar" onChange={handleFileInputChange} />
-          <img className={css('mini-img')} src={infoWorkerAdd?.avatar} />
+          <img className={css('mini-img')} src={`data:image/png;base64,${infoWorkerAdd?.fileData}`} />
         </div>
         <div className={css('delete-worker')}>
           <span>Chỉnh sửa thông tin công nhân</span>
@@ -189,12 +208,12 @@ function Worker() {
           <input
             className={css('worker-info')}
             type="text"
-            value={infoWorkerModify?.area}
+            value={infoWorkerModify?.noteArea}
             onChange={(e) => {
               setInfoWorkerModify((prev) => {
                 return {
                   ...prev,
-                  area: e.target.value,
+                  noteArea: e.target.value,
                 };
               });
             }}
@@ -239,12 +258,12 @@ function Worker() {
               <tr key={index}>
                 <td>{worker.workerId}</td>
                 <td>{worker.workerName}</td>
-                <td>{worker.area}</td>
+                <td>{worker.noteArea}</td>
                 <td>{worker.rfid}</td>
                 <td
                   className={css('view-avatar')}
                   onClick={() => {
-                    setImgURL(worker.avatar);
+                    setImgURL(`data:image/png;base64,${worker.fileData}`);
                     setISOpen(true);
                   }}
                 >
@@ -257,9 +276,9 @@ function Worker() {
                     className={css('icon-pen')}
                   />
                   <FontAwesomeIcon
-                    onClick={() => handleDeleteWorker(worker)}
+                    onClick={() => handleDeleteWorker(worker.workerId)}
                     icon={faTrash}
-                    className={css('icon-pen')}
+                    className={css('icon-trash')}
                   />
                 </td>
               </tr>

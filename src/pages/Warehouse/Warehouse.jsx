@@ -1,6 +1,8 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Warehouse.module.scss';
 import { listAreaFake, listMachineFake } from '~/utils/fakeData';
+import { putDetail } from '~/services/putServices';
+import { getProject, getListDetail } from '~/services/getServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -15,35 +17,32 @@ const css = classNames.bind(style);
 
 function Warehouse() {
   const [load, setLoad] = useState(false);
-  const [listArea, setListArea] = useState([]);
-  const [listMachine, setListMachine] = useState([]);
-  const [currentMachine, setCurrentMachine] = useState('');
-  const [currentArea, setCurrentArea] = useState('');
-  const [listError, setListError] = useState([]);
-  const [errorNote, setErrorNote] = useState([]);
-  const [dateError, setDateError] = useState('');
+  const [listProject, setListProject] = useState([]);
+  const [listDetail, setListDetail] = useState([]);
+  const [currentDetail, setCurrentDetail] = useState('');
+  const [currentProject, setCurrentProject] = useState('');
   useEffect(() => {
-    setListArea(listAreaFake);
+    const getDataInit = async () => {
+      const res = await getProject();
+      setListProject(res);
+    };
+    getDataInit();
   }, []);
 
-  const getListMachineOfProject = async (selectedOption) => {
-    setCurrentArea(selectedOption);
-    const templistMachine = listMachineFake.filter((x) => x.areaId == selectedOption.areaId);
-    setListMachine(templistMachine);
-    setCurrentMachine('');
-  };
-
-  const handleChange = (selectedOption) => {
-    setCurrentMachine(selectedOption);
+  const getListDetailOfProject = async (selectedOption) => {
+    setCurrentProject(selectedOption);
+    const res = await getListDetail(selectedOption.projectId);
+    setListDetail(res);
+    setCurrentDetail('');
   };
 
   const checkInput = () => {
-    if (!currentArea) {
+    if (!currentProject) {
       alert('Vui lòng chọn Khu vực ');
       return false;
     }
 
-    if (!currentMachine) {
+    if (!currentDetail) {
       alert('Vui lòng chọn máy');
       return false;
     }
@@ -55,9 +54,9 @@ function Warehouse() {
     const checkResult = checkInput();
     if (checkResult) {
       setLoad(true);
-      const res = await postProject({});
+      const res = await putDetail({ detailId: currentDetail.detailId });
       setLoad(false);
-      if (res) {
+      if (res == currentDetail.detailId) {
         setTimeout(() => {
           alert('Cập nhật thành công');
         }, 50);
@@ -71,6 +70,10 @@ function Warehouse() {
     }
   };
 
+  const handleChange = (selectedOption) => {
+    setCurrentDetail(selectedOption);
+  };
+
   return (
     <div className={css('container')}>
       <div className={css('record-error')}>
@@ -79,12 +82,12 @@ function Warehouse() {
           <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn dự án</span>
           <div className="w-[360px]">
             <Select
-              value={currentArea}
-              onChange={getListMachineOfProject}
-              options={listArea?.map((option) => ({
+              value={currentProject}
+              onChange={getListDetailOfProject}
+              options={listProject?.map((option) => ({
                 ...option,
-                value: option.areaId,
-                label: `${option.areaName}`,
+                value: option.projectId,
+                label: `${option.projectId}---${option.projectName}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"
@@ -103,12 +106,12 @@ function Warehouse() {
           <span className="flex h-[32px] leading-[32px] min-w-[120px]">Chọn chi tiết</span>
           <div className="w-[360px]">
             <Select
-              value={currentMachine}
+              value={currentDetail}
               onChange={handleChange}
-              options={listMachine?.map((option) => ({
+              options={listDetail?.map((option) => ({
                 ...option,
-                value: option.machineId,
-                label: ` ${option.machineName}`,
+                value: option.detailId,
+                label: `${option.detailId}---${option.detailName}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"

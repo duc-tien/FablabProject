@@ -96,6 +96,18 @@
     th {
       border: 1px solid #ddd;
       padding: 4px;
+      &:nth-child(1) {
+        width: 200px;
+      }
+      &:nth-child(2) {
+        width: 400px;
+      }
+      &:nth-child(3) {
+        width: 330px;
+      }
+      &:nth-child(4) {
+        width: 320px;
+      }
     }
   }
   .export-excel {

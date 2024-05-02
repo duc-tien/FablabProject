@@ -1,10 +1,8 @@
 import instance from "~/utils/api"
 
-export const postWoker=async (wokerId,wokerName,noteArea,rfid,fileData)=>{
+export const postWoker=async (worker)=>{
     try {
-    const res = await instance.post('/Woker',{
-        wokerId,wokerName,noteArea,rfid,fileData
-    })
+    const res = await instance.post('/Worker',worker)
     return res.data
     } 
     catch (error) {
@@ -12,11 +10,9 @@ export const postWoker=async (wokerId,wokerName,noteArea,rfid,fileData)=>{
     }
 }
 
-export const postMachineError=async (errorName,errorDescription,errorTime,machineId)=>{
+export const postMachineError=async (er)=>{
     try {
-    const res = await instance.post('/Machine/Error',{
-        errorName,errorDescription,errorTime,machineId
-    })
+    const res = await instance.post('/Machine/Error',er)
     return res.data
     } 
     catch (error) {

@@ -18,7 +18,7 @@ export const getWorker = async( workerId=null,pageSize=10,pageNumber=1)=>{
 }
 export const getWorkerLog = async( workerId,start=null,end=null)=>{
     try {
-          const res = await instance.get('/Worker',{
+          const res = await instance.get('/Worker/Log',{
         params:{
             workerId,
             start,
@@ -97,13 +97,13 @@ export const getMachineError = async(machineId,start=null,end=null)=>{
         
     }
 }
-export const getMachineOEE = async(machineId,start=null,end=null)=>{
+export const getMachineOEE = async(machineId,startDate=null,endDate=null)=>{
     try {
         const res = await instance.get('/Machine/OEE',{
             params:{
                 machineId,
-                start,
-                end
+                startDate,
+                endDate
             }
         })
         return res.data
@@ -153,3 +153,6 @@ export const getDetailLog=async(detailId )=>{
         console.log(error);
     }
 }
+
+
+

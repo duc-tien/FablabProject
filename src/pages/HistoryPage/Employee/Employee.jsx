@@ -1,6 +1,6 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Employee.module.scss';
-import { getWorker, getDetail, getMachine } from '~/services/getServices';
+import { getWorker, getWorkerLog } from '~/services/getServices';
 import { listWorkerFake, stage } from '~/utils/fakeData';
 import noUser from '~/assets/imgs/noUser.jpg';
 import saveExcel from '~/utils/saveExcel';
@@ -27,7 +27,11 @@ function Employee() {
   const [historyOfWorker, setHistoryOfWorker] = useState([]);
 
   useEffect(() => {
-    setListWorkerInit(listWorkerFake);
+    const getDataInit = async () => {
+      const res = await getWorker();
+      setListWorkerInit(res);
+    };
+    getDataInit();
     const today = moment().format('YYYY-MM-DD');
     const sevenDaysAgo = moment().subtract(7, 'days').format('YYYY-MM-DD');
 
@@ -48,34 +52,22 @@ function Employee() {
     const checkResult = checkInput();
     if (checkResult) {
       setLoad(true);
-      await postProject({});
-      setCurrentWorkerInfo(worker);
-      const tempHistory = stage.filter((x) => x.workerId == worker.workerId);
+      const res = await getWorkerLog(worker.workerId, `${startDate} 00:00:01`, `${endDate} 23:59:59`);
+      const tempHistory = res.filter((x) => x.endTagging != null);
       const history = tempHistory.map((e) => {
-        const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+        const processTime = calculateTime(e.startTagging, e.endTagging, 0);
+        let newStartTagging = e.startTagging.replace(/-/g, '/');
+        newStartTagging = newStartTagging.replace('T', ' ');
+        newStartTagging = newStartTagging.substring(0, 19);
         return {
           ...e,
           processTime: processTime,
+          startTagging: newStartTagging,
         };
       });
       setHistoryOfWorker(history);
+      setCurrentWorkerInfo(worker);
       setLoad(false);
-      // if (startDate && endDate) {
-      //   setHistoryOfWorker((prev) => {
-      //     const filter = alterHistory.filter((e) => {
-      //       const compareTime = new Date(e.startTime);
-      //       const dateBefore = new Date(startDate);
-      //       dateBefore.setHours(7, 0, 0);
-      //       const dateAfter = new Date(endDate);
-      //       dateAfter.setHours(18, 0, 0);
-      //       const result = compareTime >= dateBefore && compareTime <= dateAfter;
-      //       return result;
-      //     });
-      //     return filter;
-      //   });
-      // } else {
-      //   setHistoryOfWorker(alterHistory);
-      // }
     }
   };
   const handleChange = (selectedOption) => {
@@ -158,14 +150,14 @@ function Employee() {
 
       <h1>Thông tin truy xuất</h1>
       <div className={css('info-container')}>
-        <img src={currentWorkerInfo?.avatar || noUser} className={css('worker-avatar')}></img>
+        <img src={`data:image/png;base64,${currentWorkerInfo?.fileData}`} className={css('worker-avatar')}></img>
         <div className={css('worker-info')}>
           <div>{currentWorkerInfo?.workerName}</div>
           <div>
             <b>Mã định danh :</b> {currentWorkerInfo?.workerId}
           </div>
           <div>
-            <b>Khu vực:</b> {currentWorkerInfo.area}
+            <b>Khu vực:</b> {currentWorkerInfo.noteArea}
           </div>
         </div>
       </div>
@@ -176,9 +168,7 @@ function Employee() {
         <thead>
           <tr>
             <th>Mã chi tiết</th>
-            {/* <th>Tên chi tiết</th> */}
             <th>Vị trí máy</th>
-            {/* <th>Tên máy</th> */}
             <th>Thời điểm gia công</th>
             <th>Thời gian gia công</th>
           </tr>
@@ -188,10 +178,8 @@ function Employee() {
             return (
               <tr key={index}>
                 <td>{e.detailId}</td>
-                {/* <td>{e.detailName}</td> */}
-                <td>{e.machineLabel}</td>
-                {/* <td>{e.machineName}</td> */}
-                <td>{e.startProcessTime}</td>
+                <td>{`${e.machineId}--${e.machineName}`}</td>
+                <td>{e.startTagging}</td>
                 <td>{e.processTime}</td>
               </tr>
             );

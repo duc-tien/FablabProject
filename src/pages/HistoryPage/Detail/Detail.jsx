@@ -1,12 +1,11 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Detail.module.scss';
-import { addHobby, deleteHobby } from '~/redux/hobbySlice';
-import ModalLogin from '~/components/ModalLogin/ModalLogin';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
 import Loading from '~/components/Loading';
 import { postProject } from '~/services/postServices';
+import { getDetailLog, getProject, getListDetail } from '~/services/getServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -26,13 +25,17 @@ function Detail() {
   const [infoDetail, setInfoDetail] = useState({});
   const [stageDetail, setStageDetail] = useState([]);
   useEffect(() => {
-    setListProject(listProjectFake);
+    const getDataInit = async () => {
+      const res = await getProject();
+      setListProject(res);
+    };
+    getDataInit();
   }, []);
 
   const getListDetailOfProject = async (selectedOption) => {
     setCurrentProject(selectedOption);
-    const tempListDetail = listDetailFake.filter((x) => x.projectId == selectedOption.projectId);
-    setListDetail(tempListDetail);
+    const res = await getListDetail(selectedOption.projectId);
+    setListDetail(res);
     setCurrentDetail('');
   };
 
@@ -53,22 +56,42 @@ function Detail() {
     const checkResult = checkInput();
     if (checkResult) {
       setLoad(true);
-      await postProject({});
-      const tempStageOfDetail = stage.filter((x) => x.detailId == detail.detailId);
-      const stageOfDetail = tempStageOfDetail.map((e) => {
-        const processTime = calculateTime(e.startProcessTime, e.endProcessTime, 0);
+      const res = await getDetailLog(detail.detailId);
+
+      const tempHistory = res.logForDetailFull.map((e) => {
+        const processTime = calculateTime(e.startTagging, e.endTagging, 0);
+        let newStartTagging = e.startTagging.replace(/-/g, '/');
+        newStartTagging = newStartTagging.replace('T', ' ');
+        newStartTagging = newStartTagging.substring(0, 19);
         return {
           ...e,
           processTime: processTime,
+          startTagging: newStartTagging,
         };
       });
-      setStageDetail(stageOfDetail);
-      setInfoDetail(() => {
-        return {
-          ...detail,
-          projectName: currentProject.projectName,
-        };
-      });
+
+      let newStartTimePre = res.startTimePre.replace(/-/g, '/');
+      newStartTimePre = newStartTimePre.replace('T', ' ');
+      newStartTimePre = newStartTimePre.substring(0, 19);
+
+      let newEndTimePre = res.endTimePre.replace(/-/g, '/');
+      newEndTimePre = newEndTimePre.replace('T', ' ');
+      newEndTimePre = newEndTimePre.substring(0, 11);
+
+      let status;
+      if (res.detailStatus == 0) status = 'Chưa gia công';
+      if (res.detailStatus == 1) status = 'Gia công';
+      if (res.detailStatus == 2) status = 'Hoàn thành gia công';
+
+      const tempInfo = {
+        ...res,
+        startTimePre: newEndTimePre,
+        endTimePre: newEndTimePre,
+        logForDetailFull: tempHistory,
+        detailStatus: status,
+      };
+
+      setInfoDetail(tempInfo);
       setLoad(false);
     }
   };
@@ -158,7 +181,7 @@ function Detail() {
           <span>Mã dự án:</span>
           <span>{infoDetail?.projectId}</span>
           <span>Thời gian ban hành:</span>
-          <span>{infoDetail.startTime}</span>
+          <span>{infoDetail.startTimePre}</span>
         </div>
         <div className={css('info-detail')}>
           <span>Tên chi tiết:</span>
@@ -166,11 +189,15 @@ function Detail() {
           <span>Tên dự án:</span>
           <span>{infoDetail?.projectName}</span>
           <span>Thời gian dự kiến kết thúc:</span>
-          <span>{infoDetail?.endTime}</span>
+          <span>{infoDetail?.endTimePre}</span>
+        </div>
+        <div className={css('info-detail')}>
+          <span>Trạng thái:</span>
+          <span>{infoDetail?.detailStatus}</span>
         </div>
         <div className={css('info-detail')}>
           <span>Công đoạn dự kiến:</span>
-          <span>{infoDetail?.stage}</span>
+          <span>{infoDetail?.noteLog}</span>
         </div>
         <div className={css('info-detail')}>
           <span>Công đoạn đã qua:</span>
@@ -187,12 +214,12 @@ function Detail() {
           </tr>
         </thead>
         <tbody>
-          {stageDetail?.map((e, index) => {
+          {infoDetail.logForDetailFull?.map((e, index) => {
             return (
               <tr key={index}>
-                <td>{e.machineLabel}</td>
-                <td>{e.workerId}</td>
-                <td>{e.startProcessTime}</td>
+                <td>{`${e.machineId}--${e.machineName}`}</td>
+                <td>{e.workerName}</td>
+                <td>{e.startTagging}</td>
                 <td>{e.processTime}</td>
               </tr>
             );

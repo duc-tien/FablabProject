@@ -1,6 +1,6 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Project.module.scss';
-import { getDetail, getMachine, getProject, getWorker } from '~/services/getServices';
+import { getProject, getListDetail } from '~/services/getServices';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import Loading from '~/components/Loading';
 import saveExcel from '~/utils/saveExcel';
@@ -19,24 +19,47 @@ function Project() {
   const [load, setLoad] = useState(false);
   const [imgURL, setImgURL] = useState('');
   const [isOpen, setISOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [listDetailFilter, setListDetailFilter] = useState([]);
   const [listProject, setListProject] = useState([]);
   const [currentProject, setCurrentProject] = useState('');
   const [currentProjectInfo, setCurrentProjectInfo] = useState({});
+
   useEffect(() => {
-    setListProject(listProjectFake);
+    const getDataInit = async () => {
+      const res = await getProject();
+      setListProject(res);
+    };
+    getDataInit();
   }, []);
 
   const getDetailOfProject = async (project) => {
     const checkResult = checkInput();
     if (checkResult) {
       setLoad(true);
-      await postProject({});
-      const tempListDetail = listDetailFake.filter((x) => x.projectId == project.projectId);
-      setListDetailFilter(tempListDetail);
-      setCurrentProjectInfo(project);
+      const res = await getListDetail(project.projectId);
+      const listDetailOfProject = res.map((e) => {
+        let newStartTimePre = e.startTimePre.replace(/-/g, '/');
+        newStartTimePre = newStartTimePre.replace('T', ' ');
+        newStartTimePre = newStartTimePre.substring(0, 19);
+
+        let newEndTimePre = e.endTimePre.replace(/-/g, '/');
+        newEndTimePre = newEndTimePre.replace('T', ' ');
+        newEndTimePre = newEndTimePre.substring(0, 11);
+
+        let status;
+        if (e.detailStatus == 0) status = 'Chưa gia công';
+        if (e.detailStatus == 1) status = 'Gia công';
+        if (e.detailStatus == 2) status = 'Hoàn thành gia công';
+        return {
+          ...e,
+          startTimePre: newEndTimePre,
+          endTimePre: newEndTimePre,
+          detailStatus: status,
+        };
+      });
       setLoad(false);
+      setCurrentProjectInfo(project);
+      setListDetailFilter(listDetailOfProject);
     }
   };
   const handleChange = (selectedOption) => {
@@ -99,10 +122,20 @@ function Project() {
             return (
               <tr key={index}>
                 <td>{detail.detailId}</td>
-                <td>{detail.startTime}</td>
-                <td>{detail.endTime}</td>
+                <td>{detail.startTimePre}</td>
+                <td>{detail.endTimePre}</td>
                 <td>{detail.detailStatus}</td>
-                <td>Xem chi tiết</td>
+                <td
+                  onClick={() => {
+                    setImgURL(() => {
+                      const base64img = `data:image/png;base64,${detail.detailPicture}`;
+                      return base64img;
+                    });
+                    setISOpen(true);
+                  }}
+                >
+                  Xem chi tiết
+                </td>
               </tr>
             );
           })}

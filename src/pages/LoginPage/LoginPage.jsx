@@ -1,7 +1,7 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './LoginPage.module.scss';
 import ModalLogin from '~/components/ModalLogin/ModalLogin';
-import { getProject, getDetail } from '~/services/getServices';
+import { getProject } from '~/services/getServices';
 import Loading from '~/components/Loading';
 import { listProjectFake, listDetailFake, listUser } from '~/utils/fakeData';
 import { setUserInfo } from '~/redux/authSlice';

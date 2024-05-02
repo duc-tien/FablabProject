@@ -1,6 +1,8 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './RecordError.module.scss';
 import { listAreaFake, listMachineFake } from '~/utils/fakeData';
+import { getArea, getMachine } from '~/services/getServices';
+import { postMachineError } from '~/services/postServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -15,21 +17,26 @@ const css = classNames.bind(style);
 
 function RecordError() {
   const [load, setLoad] = useState(false);
-  const [listArea, setListArea] = useState([]);
-  const [listMachine, setListMachine] = useState([]);
+  const [listAreaInit, setListAreaInit] = useState([]);
+  const [listMCInit, setListMCInit] = useState([]);
   const [currentMachine, setCurrentMachine] = useState('');
   const [currentArea, setCurrentArea] = useState('');
   const [listError, setListError] = useState([]);
   const [errorNote, setErrorNote] = useState([]);
   const [dateError, setDateError] = useState('');
+
   useEffect(() => {
-    setListArea(listAreaFake);
+    const getDataInit = async () => {
+      const res = await getArea();
+      setListAreaInit(res);
+    };
+    getDataInit();
   }, []);
 
   const getListMachineOfProject = async (selectedOption) => {
     setCurrentArea(selectedOption);
-    const templistMachine = listMachineFake.filter((x) => x.areaId == selectedOption.areaId);
-    setListMachine(templistMachine);
+    const res = await getMachine(selectedOption.areaId);
+    setListMCInit(res);
     setCurrentMachine('');
   };
 
@@ -57,16 +64,18 @@ function RecordError() {
     }
     return true;
   };
-  const addError = () => {
+  const addError = async () => {
     const checkResult = checkInput();
     if (checkResult) {
       setListError((prev) => {
         return [
           ...prev,
           {
+            machineId: currentMachine.machineId,
             machineName: currentMachine.label,
-            error: errorNote,
-            date: dateError,
+            errorDescription: '',
+            errorTime: dateError,
+            errorName: errorNote,
           },
         ];
       });
@@ -81,9 +90,19 @@ function RecordError() {
   const handleSubmit = async () => {
     if (listError.length > 0) {
       setLoad(true);
-      const res = await postProject({});
-      setLoad(false);
-      if (res) {
+      let res;
+      for (let i = 0; i < listError.length; i++) {
+        const dataPost = {
+          machineId: listError[i].machineId,
+          errorName: listError[i].errorName,
+          errorDescription: '',
+          errorTime: `${listError[i].errorTime} 07:00:00`,
+        };
+        res = await postMachineError(dataPost);
+        setLoad(false);
+      }
+
+      if (typeof res == 'string') {
         setTimeout(() => {
           alert('Cập nhật thành công');
         }, 50);
@@ -107,10 +126,10 @@ function RecordError() {
             <Select
               value={currentArea}
               onChange={getListMachineOfProject}
-              options={listArea?.map((option) => ({
+              options={listAreaInit?.map((option) => ({
                 ...option,
                 value: option.areaId,
-                label: `${option.areaName}`,
+                label: `${option.description}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"
@@ -131,7 +150,7 @@ function RecordError() {
             <Select
               value={currentMachine}
               onChange={handleChange}
-              options={listMachine?.map((option) => ({
+              options={listMCInit?.map((option) => ({
                 ...option,
                 value: option.machineId,
                 label: ` ${option.machineName}`,
@@ -194,10 +213,10 @@ function RecordError() {
             return (
               <tr>
                 <td>{e.machineName}</td>
-                <td>{e.date}</td>
-                <td>{e.error}</td>
+                <td>{e.errorTime}</td>
+                <td>{e.errorName}</td>
                 <td>
-                  <FontAwesomeIcon onClick={() => removeError(index)} icon={faTrash} className="cursor-pointer" />
+                  <FontAwesomeIcon onClick={() => removeError(index)} icon={faTrash} className={css('icon-trash')} />
                 </td>
               </tr>
             );

@@ -1,7 +1,8 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Period.module.scss';
 import { listAreaFake, listMachineFake } from '~/utils/fakeData';
-
+import { getArea, getMachine } from '~/services/getServices';
+import { putMaintenance } from '~/services/putServices';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -14,20 +15,24 @@ const css = classNames.bind(style);
 
 function Period() {
   const [load, setLoad] = useState(false);
-  const [listArea, setListArea] = useState([]);
-  const [listMachine, setListMachine] = useState([]);
+  const [listAreaInit, setListAreaInit] = useState([]);
+  const [listMCInit, setListMCInit] = useState([]);
   const [currentMachine, setCurrentMachine] = useState('');
   const [currentArea, setCurrentArea] = useState('');
   const [timeMaintenance, setTimeMaintenance] = useState('');
 
   useEffect(() => {
-    setListArea(listAreaFake);
+    const getDataInit = async () => {
+      const res = await getArea();
+      setListAreaInit(res);
+    };
+    getDataInit();
   }, []);
 
   const getListMachineOfProject = async (selectedOption) => {
     setCurrentArea(selectedOption);
-    const templistMachine = listMachineFake.filter((x) => x.areaId == selectedOption.areaId);
-    setListMachine(templistMachine);
+    const res = await getMachine(selectedOption.areaId);
+    setListMCInit(res);
     setCurrentMachine('');
   };
 
@@ -49,6 +54,22 @@ function Period() {
       alert('Vui lòng đặt thời gian bảo trì');
       return false;
     }
+    if (isNaN(Number(timeMaintenance))) {
+      alert('Thời gian đặt phải có định dạng số');
+      return false;
+    }
+    return true;
+  };
+  const checkInputForReset = () => {
+    if (!currentArea) {
+      alert('Vui lòng chọn Khu vực ');
+      return false;
+    }
+
+    if (!currentMachine) {
+      alert('Vui lòng chọn máy');
+      return false;
+    }
     return true;
   };
 
@@ -56,9 +77,38 @@ function Period() {
     const checkResult = checkInput();
     if (checkResult) {
       setLoad(true);
-      const res = await postProject({});
+      const time = Number(timeMaintenance) * 3600;
+      const dataPut = {
+        machineId: currentMachine.machineId,
+        motorOperationTime: currentMachine.motorOperationTime,
+        motorMaintenanceTime: time,
+      };
+      const res = await putMaintenance(dataPut);
       setLoad(false);
-      if (res) {
+      if (res == currentMachine.machineId) {
+        setTimeout(() => {
+          alert('Cập nhật thành công');
+        }, 50);
+      } else {
+        setTimeout(() => {
+          alert('Cập nhật không thành công');
+        }, 50);
+      }
+    }
+  };
+
+  const handleReset = async () => {
+    const checkResult = checkInputForReset();
+    if (checkResult) {
+      setLoad(true);
+      const dataPut = {
+        machineId: currentMachine.machineId,
+        motorOperationTime: 0,
+        motorMaintenanceTime: currentMachine.motorMaintenanceTime,
+      };
+      const res = await putMaintenance(dataPut);
+      setLoad(false);
+      if (res == currentMachine.machineId) {
         setTimeout(() => {
           alert('Cập nhật thành công');
         }, 50);
@@ -79,10 +129,10 @@ function Period() {
             <Select
               value={currentArea}
               onChange={getListMachineOfProject}
-              options={listArea?.map((option) => ({
+              options={listAreaInit?.map((option) => ({
                 ...option,
                 value: option.areaId,
-                label: `${option.areaName}`,
+                label: `${option.description}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"
@@ -103,7 +153,7 @@ function Period() {
             <Select
               value={currentMachine}
               onChange={handleChange}
-              options={listMachine?.map((option) => ({
+              options={listMCInit?.map((option) => ({
                 ...option,
                 value: option.machineId,
                 label: ` ${option.machineName}`,
@@ -139,7 +189,13 @@ function Period() {
           onClick={() => handleSubmit()}
           className="h-[36px] text-[18px] leading-[36px] text-center font-bold cursor-pointer bg-[#99CFEB] mt-[16px]"
         >
-          Xác nhận
+          Đặt lại thời gian bảo trì
+        </div>
+        <div
+          onClick={() => handleReset()}
+          className="h-[36px] text-[18px] leading-[36px] text-center font-bold cursor-pointer bg-[#99CFEB] mt-[16px]"
+        >
+          Đặt lại thời gian vận hành
         </div>
       </div>
       {load && <Loading />}

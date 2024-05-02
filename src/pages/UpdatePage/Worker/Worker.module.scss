@@ -130,6 +130,12 @@
       .icon-pen {
         cursor: pointer;
         margin-right: 8px;
+        color: #e0e000;
+      }
+      .icon-trash {
+        cursor: pointer;
+        margin-right: 8px;
+        color: red;
       }
     }
 
@@ -137,6 +143,30 @@
     th {
       border: 1px solid #fff;
       padding: 4px;
+      &:nth-child(1) {
+        width: 150px;
+      }
+      &:nth-child(2) {
+        width: 160px;
+      }
+      &:nth-child(3) {
+        width: 300px;
+      }
+      &:nth-child(4) {
+        width: 200px;
+      }
+      &:nth-child(5) {
+        width: 200px;
+      }
+      &:nth-child(6) {
+        width: 50px;
+      }
+    }
+    td {
+      &:nth-child(6) {
+        cursor: pointer;
+        font-weight: bold;
+      }
     }
   }
 

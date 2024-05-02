@@ -1,10 +1,10 @@
 import instance from "~/utils/api";
 
-export const deleteWoker=async(wokerId)=>{
+export const deleteWoker=async(workerId)=>{
     try {
-        await instance.delete('/Woker',{
+        await instance.delete('/Worker',{
             params:{
-                wokerId
+                workerId
             }
         })
     } catch (error) {

@@ -13,9 +13,9 @@ import * as XLSX from 'xlsx';
 const css = classNames.bind(style);
 
 function UpdateProject() {
-  // useEffect(() => {
-  //   hubConnection.start();
-  // }, [hubConnection.connection]);
+  useEffect(() => {
+    hubConnection.start();
+  }, [hubConnection.connection]);
   const [load, setLoad] = useState(false);
   const [dataExcel, setDataExcel] = useState([]);
   const [imgURL, setImgURL] = useState('');
@@ -41,7 +41,7 @@ function UpdateProject() {
       e.detailName = e['Tên chi tiết'];
       e.detailId = e['Mã chi tiết'];
       e.imgURL = e['Ảnh chi tiết'];
-      e.state = e['Công đoạn'];
+      e.stage = e['Công đoạn'];
       // delete old key
       delete e['Mã dự án'];
       delete e['Tên dự án'];
@@ -95,7 +95,9 @@ function UpdateProject() {
       return new Promise((resolve, reject) => {
         reader.onloadend = () => {
           const base64String = reader.result;
-          resolve(base64String);
+          const index = base64String.indexOf(',');
+          const newbase64 = base64String.substring(index + 1);
+          resolve(newbase64);
         };
         reader.onerror = reject;
       });
@@ -110,20 +112,18 @@ function UpdateProject() {
       let tempProject = {
         projectId: dataExcel[0].projectId,
         projectName: dataExcel[0].projectName,
-        startDate: dataExcel[0].startDate,
-        endDate: dataExcel[0].endDate,
-        note: 'string',
-        oderId: 'OD240327002',
         details: [],
       };
       for (const value of dataExcel) {
         const imgBase64 = await fetchImage(value.imgURL);
-        console.log(imgBase64);
         tempProject.details = [
           ...tempProject.details,
           {
             detailId: value.detailId,
             detailName: value.detailName,
+            startTimePre: value.startDate,
+            endTimePre: value.endDate,
+            noteLog: value.stage,
             fileData: imgBase64,
           },
         ];
@@ -147,6 +147,15 @@ function UpdateProject() {
     }
   };
 
+  const sendSignalR = async () => {
+    const machine = 'TSH1390';
+    let data = {};
+    for (let i = 0; i < dataExcel.length; i++) {
+      const key = `MCT${i + 1}`;
+      data[key] = dataExcel[i].detailId;
+    }
+    hubConnection.connection.send('SendCommand', machine, JSON.stringify(data));
+  };
   return (
     <div className={css('project')}>
       <div className={css('project-input')}>
@@ -180,7 +189,7 @@ function UpdateProject() {
                   <td>{data.detailName}</td>
                   <td>{data.startDate}</td>
                   <td>{data.endDate}</td>
-                  <td>{data.state}</td>
+                  <td>{data.stage}</td>
                   <td
                     onClick={() => {
                       setImgURL(data.imgURL);
@@ -195,6 +204,7 @@ function UpdateProject() {
           </tbody>
         </table>
         <div className={css('button-update')}>
+          <button onClick={() => sendSignalR()}>Gửi mqtt</button>
           <button onClick={() => saveToDb()}>Lưu</button>
         </div>
       </div>
