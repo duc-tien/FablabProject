@@ -3,10 +3,10 @@ const calculateTime=(startTime,endTime,storeTime)=>{
         const timeFormer = new Date(startTime);
         let timeLater = new Date(endTime);
         let timeDiff
-        if(timeFormer<timeLater && storeTime>0){
+        if(timeFormer<=timeLater && storeTime>0){
           timeDiff=storeTime*1000
         }
-        else if(timeFormer<timeLater && storeTime==0)
+        else if(timeFormer<=timeLater && storeTime==0)
         {
            timeDiff = timeLater.getTime() - timeFormer.getTime() ;
         } else{
@@ -29,4 +29,8 @@ const formatTime = (time) => {
     if (time < 10) time = '0' + time;
     return time;
   };
+
+
 export default calculateTime
+
+

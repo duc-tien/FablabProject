@@ -1,5 +1,5 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
-import style from './Warehouse.module.scss';
+import style from './ComfirmDetail.module.scss';
 import { listAreaFake, listMachineFake } from '~/utils/fakeData';
 import { putDetail } from '~/services/putServices';
 import { getProject, getListDetail } from '~/services/getServices';
@@ -15,7 +15,7 @@ import { postProject } from '~/services/postServices';
 // --------------------------------- END LIBRARY---------------------------------------------
 const css = classNames.bind(style);
 
-function Warehouse() {
+function ComfirmDetail() {
   const [load, setLoad] = useState(false);
   const [listProject, setListProject] = useState([]);
   const [listDetail, setListDetail] = useState([]);
@@ -140,4 +140,4 @@ function Warehouse() {
   );
 }
 
-export default Warehouse;
+export default ComfirmDetail;

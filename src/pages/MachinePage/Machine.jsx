@@ -7,7 +7,7 @@ import SemiCircleBar from '~/components/SemiCircleBar';
 import CircleBar from '~/components/CircleBar';
 import calculateTime from '~/utils/calculateTime';
 import calculateSumTime from '~/utils/calculateSumTime';
-import { getArea, getMachine, getWorker, getMachineDetailLog } from '~/services/getServices';
+import { getArea, getMachine, getWorker, getMachineDetailLog, getMachineELog } from '~/services/getServices';
 import ProgressBar from '~/components/ProgressBar';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
@@ -35,29 +35,39 @@ function Machine() {
     hubConnection.start();
     hubConnection.connection.on('DataMachineChanged', async (msg) => {
       const dataSignalR = JSON.parse(msg);
-
       const today = new Date();
       const start = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 00:00:01`;
       const end = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 23:00:01`;
 
-      const tempListStage = await getMachineDetailLog(currentMachine.machineId, start, end);
-      const list = tempListStage.map((e) => {
+      const tempListStage = await getMachineDetailLog(machineSelected.machineId, start, end);
+      const list1 = tempListStage.map((e) => {
         return {
           startTimeStamp: e.startTagging,
           endTimeStamp: e.endTagging,
         };
       });
-      const accumulateTime = calculateSumTime(list);
+      const tempListELog = await getMachineELog(machineSelected.machineId, start, end);
+      const list2 = tempListELog.map((e) => {
+        return {
+          startTimeStamp: e.startTagging,
+          endTimeStamp: e.endTagging,
+        };
+      });
+
+      const accumulateNetRunTime = calculateSumTime(list1);
+      const accumulateRunTime = calculateSumTime(list2);
+      const key = dataSignalR.name;
+      const data = dataSignalR;
+      const [worker] = await getWorker(dataSignalR.value);
 
       if (dataSignalR.machineId == currentMachine.machineId) {
-        console.log(dataSignalR);
-        const key = dataSignalR.name;
-        const data = dataSignalR;
         setDataForDisplay((prev) => {
           return {
             ...prev,
             [key]: data,
-            storeTime: accumulateTime,
+            storeRunTime: accumulateRunTime,
+            storeNetRunTime: accumulateNetRunTime,
+            worker: typeof worker == 'undefined' ? prev.worker : worker,
           };
         });
       }
@@ -105,18 +115,22 @@ function Machine() {
     seconds = formatTime(seconds % 60);
     minutes = formatTime(minutes % 60);
     hours = formatTime(hours % 24);
-    if (timeDiff < 8 * 60 * 60 * 1000) {
+    if (timeDiff < 4 * 3600 * 1000) {
       setWorkTime(`${hours}:${minutes}:${seconds}`);
+    } else if (timeDiff < 6 * 3600 * 1000) {
+      setWorkTime(`04:00:00`);
+    } else if (timeDiff > 6 * 3600 * 1000 && timeDiff < 8 * 3600 * 1000) {
+      setWorkTime(`${hours - 2}:${minutes}:${seconds}`);
     } else {
-      setWorkTime(`08:00:00`);
+      setWorkTime('08:00:00');
     }
   };
   const getRunTime = (startTime, endTime) => {
-    const duration = calculateTime(startTime, endTime, 0);
+    const duration = calculateTime(startTime, endTime, dataForDisplay.storeRunTime);
     setRunTime(duration);
   };
   const getNetRunTime = (startTime, endTime) => {
-    const duration = calculateTime(startTime, endTime, dataForDisplay.storeTime);
+    const duration = calculateTime(startTime, endTime, dataForDisplay.storeNetRunTime);
     setNetRunTime(duration);
   };
   const getProcessTime = (startTime, endTime) => {
@@ -163,20 +177,31 @@ function Machine() {
             tempDataDisplay[key] = data;
           }
         }
-        const [worker] = await getWorker(tempDataDisplay.MaterialCodeProducting.operatorid);
+        const [worker] = await getWorker(tempDataDisplay.Operator.value);
 
         const today = new Date();
         const start = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 00:00:01`;
         const end = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 23:00:01`;
+
         const tempListStage = await getMachineDetailLog(machineSelected.machineId, start, end);
-        const list = tempListStage.map((e) => {
+        const list1 = tempListStage.map((e) => {
           return {
             startTimeStamp: e.startTagging,
             endTimeStamp: e.endTagging,
           };
         });
-        const accumulateTime = calculateSumTime(list);
-        tempDataDisplay.storeTime = accumulateTime;
+        const tempListELog = await getMachineELog(machineSelected.machineId, start, end);
+        const list2 = tempListELog.map((e) => {
+          return {
+            startTimeStamp: e.startTagging,
+            endTimeStamp: e.endTagging,
+          };
+        });
+
+        const accumulateNetRunTime = calculateSumTime(list1);
+        const accumulateRunTime = calculateSumTime(list2);
+        tempDataDisplay.storeNetRunTime = accumulateNetRunTime;
+        tempDataDisplay.storeRunTime = accumulateRunTime;
         tempDataDisplay.worker = worker;
         setDataForDisplay(tempDataDisplay);
       });
@@ -221,7 +246,7 @@ function Machine() {
                 options={listMCInit?.map((option) => ({
                   ...option,
                   value: option.machineId,
-                  label: `${option.machineId}---${option.machineName}`,
+                  label: `${option.machineId} • ${option.machineName}`,
                 }))}
                 isSearchable={false}
                 menuPlacement="auto"
@@ -270,15 +295,15 @@ function Machine() {
               <span>{workTime}</span>
             </div>
             <div className={css('div')}>
-              <span className={css('content-inner-title')}>Nhân viên: </span>
-              <span>{dataForDisplay.worker?.workerName}</span>
+              <span className={css('content-inner-title')}>Công nhân: </span>
+              <span>{`${dataForDisplay.worker?.workerId} • ${dataForDisplay.worker?.workerName}`}</span>
             </div>
             <div className={css('div')}>
               <span className={css('content-inner-title')}>Chi tiết gia công: </span>
               <span>{dataForDisplay.MaterialCodeProducting?.value}</span>
             </div>
             <div className={css('div')}>
-              <span className={css('content-inner-title')}>Thời gian gia công:</span>
+              <span className={css('content-inner-title')}>Thời gian gia công chi tiết:</span>
               <span>{processTime}</span>
             </div>
             <div className={css('div')}>

@@ -26,12 +26,11 @@ const css = classNames.bind(style);
 
 function Layout({ children, header }) {
   const dispatch = useDispatch();
-  const [currentTime, setCurrentTime] = useState();
   const [isExtra, setIsExtra] = useState(false);
   const [route, setRoute] = useState();
   const [listIconSidebar, setListIconSidebar] = useState();
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const listIconAdmin = [faSliders, faHardDrive, faUpload, faClockRotateLeft, faCartShopping, faGear];
+  const listIconAdmin = [faSliders, faHardDrive, faClockRotateLeft, faUpload, faGear];
   const listIconUser = [faSliders, faHardDrive, faClockRotateLeft];
 
   useEffect(() => {

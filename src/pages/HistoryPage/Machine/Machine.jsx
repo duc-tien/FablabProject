@@ -6,7 +6,7 @@ import Recharts from '~/components/Recharts';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
 import Loading from '~/components/Loading';
-import { postProject } from '~/services/postServices';
+import { formatTimeFull, formatTimeWithOnlyDate } from '~/utils/formatTime';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -31,6 +31,7 @@ function Machine() {
   const [dataError, setDataError] = useState([]);
   const [curInfo, setCurInfo] = useState();
   const [view, setView] = useState();
+  const [enableExport, setEnableExport] = useState(false);
   const retrieve = [
     {
       value: 1,
@@ -78,15 +79,11 @@ function Machine() {
     if (resultCheck) {
       setLoad(true);
 
-      // switch (info.value) {
-      // case 1: {
       const resLog = await getMachineDetailLog(machine.machineId, `${startDate} 00:00:01`, `${endDate} 23:59:59`);
 
       const history = resLog.map((e) => {
         const processTime = calculateTime(e.startTagging, e.endTagging, 0);
-        let newStartTagging = e.startTagging.replace(/-/g, '/');
-        newStartTagging = newStartTagging.replace('T', ' ');
-        newStartTagging = newStartTagging.substring(0, 19);
+        let newStartTagging = formatTimeFull(e.startTagging);
         return {
           ...e,
           processTime: processTime,
@@ -95,14 +92,10 @@ function Machine() {
       });
 
       setHistoryOfMachine(history);
-      // break;
-      // }
-      // case 2: {
+
       const resOEE = await getMachineOEE(machine.machineId, `${startDate} 00:00:01`, `${endDate} 23:59:59`);
       const historyOEE = resOEE.map((e) => {
-        let newTimeStamp = e.timeStamp.replace(/-/g, '/');
-        newTimeStamp = newTimeStamp.replace('T', ' ');
-        newTimeStamp = newTimeStamp.substring(0, 19);
+        let newTimeStamp = formatTimeFull(e.timeStamp);
         return {
           ...e,
           timeStamp: newTimeStamp,
@@ -110,14 +103,10 @@ function Machine() {
       });
 
       setDataoee(historyOEE);
-      // break;
-      // }
-      // case 3: {
+
       const resError = await getMachineError(machine.machineId, `${startDate} 00:00:01`, `${endDate} 23:59:59`);
       const historyError = resError.map((e) => {
-        let newErrorTime = e.errorTime.replace(/-/g, '/');
-        newErrorTime = newErrorTime.replace('T', ' ');
-        newErrorTime = newErrorTime.substring(0, 11);
+        let newErrorTime = formatTimeFull(e.errorTime);
         return {
           ...e,
           errorTime: newErrorTime,
@@ -125,13 +114,10 @@ function Machine() {
       });
 
       setDataError(historyError);
-      // break;
-      // }
-      // }
 
       setView(info.value);
-
       setLoad(false);
+      setEnableExport(true);
     }
   };
   const handleChangeMachine = (selectedOption) => {
@@ -153,28 +139,34 @@ function Machine() {
       data = historyOfMachine.map((e) => {
         return {
           detailId: e.detailId,
-          workerId: e.workerId,
-          startProcessTime: e.startProcessTime,
+          worker: `${e.workerId} • ${e.workerName}`,
+          startProcessTime: e.startTagging,
           processTime: e.processTime,
         };
       });
 
       headers = [
         { header: 'Mã chi tiết', key: 'detailId', width: 20 },
-        { header: 'Mã nhân viên', key: 'workerId', width: 20 },
+        { header: 'Nhân viên', key: 'worker', width: 35 },
         { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
         { header: 'Thời gian gia công', key: 'processTime', width: 20 },
       ];
 
-      name = `Lịch sử máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
-    } else {
+      name = `Lịch sử gia công máy ${historyOfMachine[0]?.machineId}-${historyOfMachine[0]?.machineName} (${startDate} đến ${endDate})`;
+    } else if (view == 2) {
       data = dataoee;
       headers = [
         { header: 'Thời gian', key: 'timeStamp', width: 20 },
-        { header: 'OEE', key: 'oee', width: 20 },
-        { header: 'Năng lượng', key: 'energy', width: 20 },
+        { header: 'OEE(%)', key: 'oee', width: 20 },
       ];
-      name = `Dữ liệu OEE máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
+      name = `Dữ liệu máy ${historyOfMachine[0]?.machineId}-${historyOfMachine[0]?.machineName} (${startDate} đến ${endDate})`;
+    } else {
+      data = dataError;
+      headers = [
+        { header: 'Thời gian', key: 'errorTime', width: 20 },
+        { header: 'Lỗi', key: 'errorName', width: 20 },
+      ];
+      name = `Dữ liệu lỗi máy ${historyOfMachine[0]?.machineId}-${historyOfMachine[0]?.machineName} (${startDate} đến ${endDate})`;
     }
 
     saveExcel(headers, data, name);
@@ -221,14 +213,14 @@ function Machine() {
           />
         </div>
         <div className={css('select-title')}>Chọn máy</div>
-        <div style={{ width: '220px' }}>
+        <div style={{ width: '250px' }}>
           <Select
             value={currentMachine}
             onChange={handleChangeMachine}
             options={listMCInit?.map((option) => ({
               ...option,
               value: option.machineId,
-              label: `${option.machineId}---${option.machineName}`,
+              label: `${option.machineId} • ${option.machineName}`,
             }))}
             isSearchable={false}
             menuPlacement="auto"
@@ -242,12 +234,10 @@ function Machine() {
             }}
           />
         </div>
-      </div>
-      <div className={css('select-area')}>
         <div style={{ width: '180px' }} className={css('select-title')}>
           Chọn thông tin truy xuất
         </div>
-        <div style={{ width: '220px' }}>
+        <div style={{ width: '200px' }}>
           <Select
             value={curInfo}
             onChange={handleChangeInfo}
@@ -264,6 +254,8 @@ function Machine() {
             }}
           />
         </div>
+      </div>
+      <div className={css('select-area')}>
         <button onClick={() => getHistoryOfMachine(currentMachine, curInfo)}>Truy xuất</button>
       </div>
 
@@ -273,14 +265,14 @@ function Machine() {
         <span>{historyOfMachine[0]?.machineId}</span>
         <span>Tên máy :</span>
         <span>{historyOfMachine[0]?.machineName}</span>
-        <button onClick={saveFileExcel}>Xuất excel</button>
+        {enableExport && <button onClick={saveFileExcel}>Xuất excel</button>}
       </div>
       {view == 1 && (
         <table className={css('table-detail')}>
           <thead>
             <tr>
               <th>Mã chi tiết</th>
-              <th>Mã nhân viên</th>
+              <th>Công nhân</th>
               <th>Thời điểm gia công</th>
               <th>Thời gian gia công</th>
             </tr>
@@ -290,7 +282,7 @@ function Machine() {
               return (
                 <tr key={index}>
                   <td>{e.detailId}</td>
-                  <td>{e.workerId}</td>
+                  <td>{`${e.workerId} • ${e.workerName}`}</td>
                   <td>{e.startTagging}</td>
                   <td>{e.processTime}</td>
                 </tr>

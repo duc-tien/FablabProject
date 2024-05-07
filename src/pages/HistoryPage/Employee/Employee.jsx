@@ -6,7 +6,8 @@ import noUser from '~/assets/imgs/noUser.jpg';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
 import Loading from '~/components/Loading';
-import { postProject } from '~/services/postServices';
+import { formatTimeFull, formatTimeWithOnlyDate } from '~/utils/formatTime';
+
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -18,6 +19,7 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
 const css = classNames.bind(style);
 
 function Employee() {
+  const [enableExport, setEnableExport] = useState(false);
   const [load, setLoad] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -53,12 +55,9 @@ function Employee() {
     if (checkResult) {
       setLoad(true);
       const res = await getWorkerLog(worker.workerId, `${startDate} 00:00:01`, `${endDate} 23:59:59`);
-      const tempHistory = res.filter((x) => x.endTagging != null);
-      const history = tempHistory.map((e) => {
+      const history = res.map((e) => {
         const processTime = calculateTime(e.startTagging, e.endTagging, 0);
-        let newStartTagging = e.startTagging.replace(/-/g, '/');
-        newStartTagging = newStartTagging.replace('T', ' ');
-        newStartTagging = newStartTagging.substring(0, 19);
+        let newStartTagging = formatTimeFull(e.startTagging);
         return {
           ...e,
           processTime: processTime,
@@ -68,6 +67,7 @@ function Employee() {
       setHistoryOfWorker(history);
       setCurrentWorkerInfo(worker);
       setLoad(false);
+      setEnableExport(true);
     }
   };
   const handleChange = (selectedOption) => {
@@ -75,33 +75,23 @@ function Employee() {
   };
   const saveFileExcel = () => {
     let data, headers, name;
-    if (true) {
-      data = historyOfWorker.map((e) => {
-        return {
-          detailId: e.detailId,
-          machineId: e.machineId,
-          startProcessTime: e.startProcessTime,
-          processTime: e.processTime,
-        };
-      });
+    data = historyOfWorker.map((e) => {
+      return {
+        detailId: e.detailId,
+        machine: `${e.machineId} • ${e.machineName}`,
+        startProcessTime: e.startTagging,
+        processTime: e.processTime,
+      };
+    });
 
-      headers = [
-        { header: 'Mã chi tiết', key: 'detailId', width: 20 },
-        { header: 'Vị trí máy', key: 'machineId', width: 20 },
-        { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
-        { header: 'Thời gian gia công', key: 'processTime', width: 20 },
-      ];
+    headers = [
+      { header: 'Mã chi tiết', key: 'detailId', width: 20 },
+      { header: 'Vị trí máy', key: 'machine', width: 35 },
+      { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
+      { header: 'Thời gian gia công', key: 'processTime', width: 20 },
+    ];
 
-      name = `Lịch sử làm việc ${currentWorkerInfo.workerId}-${currentWorkerInfo.workerName} từ ${startDate} đến ${endDate}`;
-    } else {
-      data = dataoee;
-      headers = [
-        { header: 'Thời gian', key: 'timeStamp', width: 20 },
-        { header: 'OEE', key: 'oee', width: 20 },
-        { header: 'Năng lượng', key: 'energy', width: 20 },
-      ];
-      name = `Dữ liệu OEE, Năng lượng máy ${currentMachineInfo.machineId}-${currentMachineInfo.machineName}`;
-    }
+    name = `Lịch sử làm việc ${currentWorkerInfo.workerId}-${currentWorkerInfo.workerName} (${startDate} đến ${endDate})`;
 
     saveExcel(headers, data, name);
   };
@@ -122,16 +112,16 @@ function Employee() {
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-        <div className={css('select-title')}>Chọn nhân viên</div>
+        <div className={css('select-title')}>Chọn công nhân </div>
 
-        <div style={{ width: '220px' }}>
+        <div style={{ width: '280px' }}>
           <Select
             value={currentWorker}
             onChange={handleChange}
             options={listWorkerInit?.map((option) => ({
               ...option,
               value: option.workerId,
-              label: `${option.workerId}---${option.workerName}`,
+              label: `${option.workerId} • ${option.workerName}`,
             }))}
             isSearchable={false}
             menuPlacement="auto"
@@ -161,9 +151,7 @@ function Employee() {
           </div>
         </div>
       </div>
-      <div className={css('export-excel')}>
-        <button onClick={saveFileExcel}>Xuất excel</button>
-      </div>
+      <div className={css('export-excel')}>{enableExport && <button onClick={saveFileExcel}>Xuất excel</button>}</div>
       <table className={css('table-detail')}>
         <thead>
           <tr>
@@ -178,7 +166,7 @@ function Employee() {
             return (
               <tr key={index}>
                 <td>{e.detailId}</td>
-                <td>{`${e.machineId}--${e.machineName}`}</td>
+                <td>{`${e.machineId} • ${e.machineName}`}</td>
                 <td>{e.startTagging}</td>
                 <td>{e.processTime}</td>
               </tr>

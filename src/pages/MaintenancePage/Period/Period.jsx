@@ -156,7 +156,7 @@ function Period() {
               options={listMCInit?.map((option) => ({
                 ...option,
                 value: option.machineId,
-                label: ` ${option.machineName}`,
+                label: ` ${option.machineId} • ${option.machineName}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"
@@ -189,7 +189,7 @@ function Period() {
           onClick={() => handleSubmit()}
           className="h-[36px] text-[18px] leading-[36px] text-center font-bold cursor-pointer bg-[#99CFEB] mt-[16px]"
         >
-          Đặt lại thời gian bảo trì
+          Đặt thời gian bảo trì
         </div>
         <div
           onClick={() => handleReset()}

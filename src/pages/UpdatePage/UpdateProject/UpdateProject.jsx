@@ -148,13 +148,16 @@ function UpdateProject() {
   };
 
   const sendSignalR = async () => {
-    const machine = 'TSH1390';
     let data = {};
     for (let i = 0; i < dataExcel.length; i++) {
       const key = `MCT${i + 1}`;
       data[key] = dataExcel[i].detailId;
     }
-    hubConnection.connection.send('SendCommand', machine, JSON.stringify(data));
+    hubConnection.connection.send('SendCommand', 'TSH1390', JSON.stringify(data));
+    hubConnection.connection.send('SendCommand', 'ERL1330', JSON.stringify(data));
+    hubConnection.connection.send('SendCommand', 'KB36', JSON.stringify(data));
+    hubConnection.connection.send('SendCommand', 'FRD900s', JSON.stringify(data));
+    alert('Đã thực hiện gửi dữ liệu');
   };
   return (
     <div className={css('project')}>
@@ -204,7 +207,9 @@ function UpdateProject() {
           </tbody>
         </table>
         <div className={css('button-update')}>
-          <button onClick={() => sendSignalR()}>Gửi mqtt</button>
+          <button style={{ width: '120px' }} onClick={() => sendSignalR()}>
+            Gửi danh sách
+          </button>
           <button onClick={() => saveToDb()}>Lưu</button>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import axios from "axios";
 const instance=axios.create({
-    baseURL:'https://localhost:7112/api'  // host signalR
+    // baseURL:'https://localhost:7112/api'  // host signalR
+    baseURL:'https://localhost:4000/api'  // host signalR iis
+    // baseURL:'http://localhost:2000/api'  // host http
 
 })
 instance.interceptors.request.use(function (config) {

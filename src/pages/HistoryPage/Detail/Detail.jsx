@@ -4,8 +4,9 @@ import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import saveExcel from '~/utils/saveExcel';
 import calculateTime from '~/utils/calculateTime';
 import Loading from '~/components/Loading';
-import { postProject } from '~/services/postServices';
 import { getDetailLog, getProject, getListDetail } from '~/services/getServices';
+import { formatTimeFull, formatTimeWithOnlyDate } from '~/utils/formatTime';
+
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -17,6 +18,7 @@ import Select from 'react-select';
 const css = classNames.bind(style);
 
 function Detail() {
+  const [enableExport, setEnableExport] = useState(false);
   const [load, setLoad] = useState(false);
   const [listProject, setListProject] = useState([]);
   const [listDetail, setListDetail] = useState([]);
@@ -60,9 +62,7 @@ function Detail() {
 
       const tempHistory = res.logForDetailFull.map((e) => {
         const processTime = calculateTime(e.startTagging, e.endTagging, 0);
-        let newStartTagging = e.startTagging.replace(/-/g, '/');
-        newStartTagging = newStartTagging.replace('T', ' ');
-        newStartTagging = newStartTagging.substring(0, 19);
+        let newStartTagging = formatTimeFull(e.startTagging);
         return {
           ...e,
           processTime: processTime,
@@ -70,13 +70,9 @@ function Detail() {
         };
       });
 
-      let newStartTimePre = res.startTimePre.replace(/-/g, '/');
-      newStartTimePre = newStartTimePre.replace('T', ' ');
-      newStartTimePre = newStartTimePre.substring(0, 19);
+      let newStartTimePre = formatTimeWithOnlyDate(res.startTimePre);
 
-      let newEndTimePre = res.endTimePre.replace(/-/g, '/');
-      newEndTimePre = newEndTimePre.replace('T', ' ');
-      newEndTimePre = newEndTimePre.substring(0, 11);
+      let newEndTimePre = formatTimeWithOnlyDate(res.endTimePre);
 
       let status;
       if (res.detailStatus == 0) status = 'Chưa gia công';
@@ -85,7 +81,7 @@ function Detail() {
 
       const tempInfo = {
         ...res,
-        startTimePre: newEndTimePre,
+        startTimePre: newStartTimePre,
         endTimePre: newEndTimePre,
         logForDetailFull: tempHistory,
         detailStatus: status,
@@ -93,6 +89,7 @@ function Detail() {
 
       setInfoDetail(tempInfo);
       setLoad(false);
+      setEnableExport(true);
     }
   };
 
@@ -101,23 +98,23 @@ function Detail() {
   };
 
   const saveFileExcel = () => {
-    const data = stageDetail.map((e) => {
+    const data = infoDetail.logForDetailFull.map((e) => {
       return {
-        detailId: e.detailId,
-        machineId: e.machineId,
-        workerId: e.workerId,
+        machine: `${e.machineId} • ${e.machineName}`,
+        worker: `${e.workerId} • ${e.workerName}`,
+        startProcessTime: e.startTagging,
         processTime: e.processTime,
       };
     });
 
     const headers = [
-      { header: 'Mã chi tiết', key: 'detailId', width: 20 },
-      { header: 'Vị trí máy', key: 'machineId', width: 20 },
-      { header: 'Mã công nhân', key: 'workerId', width: 20 },
-      { header: 'Thời gian gian công', key: 'processTime', width: 20 },
+      { header: 'Vị trí máy', key: 'machine', width: 35 },
+      { header: 'Nhân viên', key: 'worker', width: 35 },
+      { header: 'Thời điểm gia công', key: 'startProcessTime', width: 20 },
+      { header: 'Thời gian gia công', key: 'processTime', width: 20 },
     ];
 
-    const name = `Công đoạn của chi tiết ${infoDetail.detailId}`;
+    const name = `Công đoạn gia công của chi tiết ${infoDetail.detailId}`;
     saveExcel(headers, data, name);
   };
   return (
@@ -132,7 +129,7 @@ function Detail() {
             options={listProject?.map((option) => ({
               ...option,
               value: option.projectId,
-              label: `${option.projectId}---${option.projectName}`,
+              label: `${option.projectId} • ${option.projectName}`,
             }))}
             isSearchable={false}
             menuPlacement="auto"
@@ -156,7 +153,7 @@ function Detail() {
             options={listDetail?.map((option) => ({
               ...option,
               value: option.detailId,
-              label: `${option.detailId}---${option.detailName}`,
+              label: `${option.detailId} • ${option.detailName}`,
             }))}
             isSearchable={false}
             menuPlacement="auto"
@@ -201,14 +198,14 @@ function Detail() {
         </div>
         <div className={css('info-detail')}>
           <span>Công đoạn đã qua:</span>
-          <button onClick={saveFileExcel}>Xuất excel</button>
+          {enableExport && <button onClick={saveFileExcel}>Xuất excel</button>}
         </div>
       </div>
       <table className={css('table-detail')}>
         <thead>
           <tr>
             <th>Vị trí máy</th>
-            <th>Công nhân</th>
+            <th>Nhân viên</th>
             <th>Thời điểm gia công</th>
             <th>Thời gian gia công</th>
           </tr>
@@ -217,8 +214,8 @@ function Detail() {
           {infoDetail.logForDetailFull?.map((e, index) => {
             return (
               <tr key={index}>
-                <td>{`${e.machineId}--${e.machineName}`}</td>
-                <td>{e.workerName}</td>
+                <td>{`${e.machineId} • ${e.machineName}`}</td>
+                <td>{`${e.workerId} • ${e.workerName}`}</td>
                 <td>{e.startTagging}</td>
                 <td>{e.processTime}</td>
               </tr>

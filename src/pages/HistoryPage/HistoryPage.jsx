@@ -51,7 +51,7 @@ function HistoryPage() {
           }}
           className={css('tag', { active: !active && active2 })}
         >
-          Nhân viên
+          Công nhân
         </div>
         <div
           onClick={() => {

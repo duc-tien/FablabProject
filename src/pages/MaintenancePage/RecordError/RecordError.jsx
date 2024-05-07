@@ -96,7 +96,7 @@ function RecordError() {
           machineId: listError[i].machineId,
           errorName: listError[i].errorName,
           errorDescription: '',
-          errorTime: `${listError[i].errorTime} 07:00:00`,
+          errorTime: `${listError[i].errorTime}`,
         };
         res = await postMachineError(dataPost);
         setLoad(false);
@@ -153,7 +153,7 @@ function RecordError() {
               options={listMCInit?.map((option) => ({
                 ...option,
                 value: option.machineId,
-                label: ` ${option.machineName}`,
+                label: ` ${option.machineId} • ${option.machineName}`,
               }))}
               isSearchable={false}
               menuPlacement="auto"
@@ -188,7 +188,7 @@ function RecordError() {
               value={dateError}
               onChange={(e) => setDateError(e.target.value)}
               className=" text-[18px] h-[32px] w-[315px] leading-[22px] p-[4px] outline-0 "
-              type="date"
+              type="datetime-local"
             />
           </div>
         </div>

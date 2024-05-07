@@ -1,10 +1,10 @@
 import instance from "~/utils/api";
 
-export const getWorker = async( workerId=null,pageSize=10,pageNumber=1)=>{
+export const getWorker = async( rfid=null,pageSize=10,pageNumber=1)=>{
     try {
           const res = await instance.get('/Worker',{
         params:{
-            workerId,
+            rfid,
             pageSize,
             pageNumber
         }

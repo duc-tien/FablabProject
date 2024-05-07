@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 const css = classNames.bind(style);
 
 function Recharts({ data }) {
-  let xAxisInterval = Math.round(data.length / 10);
+  let xAxisInterval = Math.round(data.length / 6);
 
   return (
     <>

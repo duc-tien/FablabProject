@@ -45,7 +45,7 @@ function LoginPage() {
         <div>Tài khoản</div>
         <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} />
         <div>Mật khẩu</div>
-        <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
         <button
           onClick={() => {

@@ -3,6 +3,7 @@ import style from './UpdatePage.module.scss';
 import BackToTop from '~/components/BackToTop';
 import UpdateProject from './UpdateProject';
 import Worker from './Worker';
+import ComfirmDetail from './ComfirmDetail';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import axios from 'axios';
@@ -15,7 +16,8 @@ import { NavLink } from 'react-router-dom';
 const css = classNames.bind(style);
 
 function UpdatePage() {
-  const [active, setActive] = useState(false);
+  const [active1, setActive1] = useState(false);
+  const [active2, setActive2] = useState(false);
   const [showBackTop, setShowBackTop] = useState(false);
   const divRef = useRef(null);
   const handleScroll = (pos) => {
@@ -33,23 +35,35 @@ function UpdatePage() {
       <div className={css('sub-header')}>
         <div
           onClick={() => {
-            setActive(false);
+            setActive1(false);
+            setActive2(false);
           }}
-          className={css('tag', { active: !active })}
+          className={css('tag', { active: !active1 && !active2 })}
         >
           Dự án
         </div>
         <div
           onClick={() => {
-            setActive(true);
+            setActive1(false);
+            setActive2(true);
           }}
-          className={css('tag', { active: active })}
+          className={css('tag', { active: !active1 && active2 })}
         >
           Công nhân
         </div>
+        <div
+          onClick={() => {
+            setActive1(true);
+            setActive2(false);
+          }}
+          className={css('tag', { active: active1 && !active2 })}
+        >
+          Xác nhận chi tiết
+        </div>
       </div>
-      {!active && <UpdateProject />}
-      {active && <Worker />}
+      {!active1 && !active2 && <UpdateProject />}
+      {!active1 && active2 && <Worker />}
+      {active1 && !active2 && <ComfirmDetail />}
 
       {showBackTop && <BackToTop func={scrollToTop} />}
     </div>

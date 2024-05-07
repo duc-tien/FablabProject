@@ -1,10 +1,13 @@
 // ----------------------------------START LOCAL LIBRARY ---------------------------------------------
 import style from './Project.module.scss';
-import { getProject, getListDetail } from '~/services/getServices';
+import { getProject, getListDetail, getDetailLog } from '~/services/getServices';
 import { listProjectFake, listDetailFake, stage } from '~/utils/fakeData';
 import Loading from '~/components/Loading';
 import saveExcel from '~/utils/saveExcel';
 import { postProject } from '~/services/postServices';
+import calculateTime from '~/utils/calculateTime';
+import calculateSumTime from '~/utils/calculateSumTime';
+import { formatTimeFull, formatTimeWithOnlyDate } from '~/utils/formatTime';
 // ----------------------------------START REACT LIBRARY---------------------------------------------
 import classNames from 'classnames/bind';
 import { useState, useRef, useEffect } from 'react';
@@ -16,6 +19,7 @@ import Select from 'react-select';
 const css = classNames.bind(style);
 
 function Project() {
+  const [enableExport, setEnableExport] = useState(false);
   const [load, setLoad] = useState(false);
   const [imgURL, setImgURL] = useState('');
   const [isOpen, setISOpen] = useState(false);
@@ -37,27 +41,53 @@ function Project() {
     if (checkResult) {
       setLoad(true);
       const res = await getListDetail(project.projectId);
-      const listDetailOfProject = res.map((e) => {
-        let newStartTimePre = e.startTimePre.replace(/-/g, '/');
-        newStartTimePre = newStartTimePre.replace('T', ' ');
-        newStartTimePre = newStartTimePre.substring(0, 19);
-
-        let newEndTimePre = e.endTimePre.replace(/-/g, '/');
-        newEndTimePre = newEndTimePre.replace('T', ' ');
-        newEndTimePre = newEndTimePre.substring(0, 11);
+      let listDetailOfProject = [];
+      for (let i = 0; i < res.length; i++) {
+        const newStartTimePre = formatTimeWithOnlyDate(res[i].startTimePre);
+        const newEndTimePre = formatTimeWithOnlyDate(res[i].endTimePre);
 
         let status;
-        if (e.detailStatus == 0) status = 'Chưa gia công';
-        if (e.detailStatus == 1) status = 'Gia công';
-        if (e.detailStatus == 2) status = 'Hoàn thành gia công';
-        return {
-          ...e,
-          startTimePre: newEndTimePre,
-          endTimePre: newEndTimePre,
-          detailStatus: status,
-        };
-      });
+        if (res[i].detailStatus == 0) status = 'Chưa gia công';
+        if (res[i].detailStatus == 1) status = 'Gia công';
+        if (res[i].detailStatus == 2) status = 'Hoàn thành gia công';
+
+        const { logForDetailFull } = await getDetailLog(res[i].detailId);
+        const listTimeStamp = logForDetailFull.map((e) => {
+          return {
+            startTimeStamp: e.startTagging,
+            endTimeStamp: e.endTagging,
+          };
+        });
+        let sumProcessTime_s;
+        if (listTimeStamp.length > 0) {
+          sumProcessTime_s = calculateSumTime(listTimeStamp);
+        } else {
+          sumProcessTime_s = 0;
+        }
+        const sumProcessTime_format = calculateTime('2024/01/01 00:00:00', '2024/01/01 00:00:00', sumProcessTime_s);
+
+        let lastStage;
+        if (res[i].detailStatus == 2) {
+          lastStage = formatTimeFull(logForDetailFull[logForDetailFull.length - 1]?.endTagging);
+        } else {
+          lastStage = '';
+        }
+
+        listDetailOfProject = [
+          ...listDetailOfProject,
+          {
+            ...res[i],
+            startTimePre: newStartTimePre,
+            endTimePre: newEndTimePre,
+            detailStatus: status,
+            sumProcessTime: sumProcessTime_format,
+            completeTime: lastStage,
+          },
+        ];
+      }
+
       setLoad(false);
+      setEnableExport(true);
       setCurrentProjectInfo(project);
       setListDetailFilter(listDetailOfProject);
     }
@@ -74,7 +104,31 @@ function Project() {
     }
     return true;
   };
-  const saveFileExcel = () => {};
+  const saveFileExcel = () => {
+    let data, headers, name;
+    data = listDetailFilter.map((e) => {
+      return {
+        detailId: e.detailId,
+        startTimePre: e.startTimePre,
+        endTimePre: e.endTimePre,
+        detailStatus: e.detailStatus,
+        sumProcessTime: e.sumProcessTime,
+        completeTime: e.completeTime,
+      };
+    });
+    headers = [
+      { header: 'Mã chi tiết', key: 'detailId', width: 20 },
+      { header: 'Ngày ban hành', key: 'startTimePre', width: 20 },
+      { header: 'Ngày dự kiến kết thúc', key: 'endTimePre', width: 22 },
+      { header: 'Trạng thái', key: 'detailStatus', width: 20 },
+      { header: 'Tổng thời gian gia công', key: 'sumProcessTime', width: 22 },
+      { header: 'Thời điểm hoàn thành', key: 'completeTime', width: 22 },
+    ];
+
+    name = `Chi tiết dự án ${currentProjectInfo?.projectId} ${currentProjectInfo?.projectName} `;
+
+    saveExcel(headers, data, name);
+  };
   return (
     <div className={css('container')}>
       <div className={css('select-area')}>
@@ -87,7 +141,7 @@ function Project() {
             options={listProject?.map((option) => ({
               ...option,
               value: option.projectId,
-              label: `${option.projectId}---${option.projectName}`,
+              label: `${option.projectId} • ${option.projectName}`,
             }))}
             isSearchable={false}
             menuPlacement="auto"
@@ -104,7 +158,7 @@ function Project() {
           <span>{currentProjectInfo?.projectId}</span>
           <span>Tên dự án:</span>
           <span>{currentProjectInfo?.projectName}</span>
-          <button onClick={saveFileExcel}>Xuất excel</button>
+          {enableExport && <button onClick={saveFileExcel}>Xuất excel</button>}
         </div>
       </div>
       <table className={css('table-detail')}>
@@ -112,8 +166,10 @@ function Project() {
           <tr>
             <th>Mã chi tiết</th>
             <th>Ngày ban hành</th>
-            <th>Kỳ vọng</th>
+            <th>Ngày dự kiến hoàn thành</th>
             <th>Trạng thái</th>
+            <th>Tổng thời gian gia công</th>
+            <th>Thời điểm hoàn thành</th>
             <th>Ảnh chi tiết</th>
           </tr>
         </thead>
@@ -125,6 +181,8 @@ function Project() {
                 <td>{detail.startTimePre}</td>
                 <td>{detail.endTimePre}</td>
                 <td>{detail.detailStatus}</td>
+                <td>{detail.sumProcessTime}</td>
+                <td>{detail.completeTime}</td>
                 <td
                   onClick={() => {
                     setImgURL(() => {
