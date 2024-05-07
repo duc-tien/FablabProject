@@ -89,7 +89,6 @@ function Worker() {
       setLoad(true);
       const res = await deleteWoker(workerId);
       setLoad(false);
-      console.log(res);
       if (res == idWorkerDelete) {
         setTimeout(() => {
           alert('Đã xóa thành công');

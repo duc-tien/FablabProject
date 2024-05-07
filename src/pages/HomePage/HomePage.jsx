@@ -27,7 +27,6 @@ function HomePage() {
     hubConnection.start();
     hubConnection.connection.on('DataMachineChanged', async (msg) => {
       const dataSignalR = JSON.parse(msg);
-
       const today = new Date();
       const start = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 00:00:01`;
       const end = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} 23:00:01`;
@@ -329,7 +328,7 @@ function HomePage() {
     //   setWorkTime(8 * 3600);
     // }
     if (timeDiff < 4 * 3600) {
-      setWorkTime(`${hours}:${minutes}:${seconds}`);
+      setWorkTime(timeDiff);
     } else if (timeDiff < 6 * 3600) {
       setWorkTime(4 * 3600);
     } else if (timeDiff > 6 * 3600 && timeDiff < 8 * 3600) {

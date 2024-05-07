@@ -1,7 +1,8 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const connection = new HubConnectionBuilder() //Lớp tạo một kết nối tới một SignalR Hub
-  .withUrl("https://localhost:7112/notificationHub", {})
+  // .withUrl("https://localhost:7112/notificationHub", {})// host local
+  .withUrl("https://iotapi20240507134111.azurewebsites.net/notificationHub", {})// host azure
   .withAutomaticReconnect()
   .build();
 
